@@ -1,9 +1,12 @@
 package tools;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.Collectors;
@@ -65,8 +68,10 @@ public final class HLSPackager {
         for (String processName: processes.keySet()) {
             status = checkProcessStatus(processName);
             statusText = status.name();
+
             if (status == ProcessStatus.ERROR) {
                 //statusText += " - " + getProcessError(processName);
+                System.out.println("\n==============================\n");
                 System.out.println(getProcessError(processName));
             }
 
@@ -104,14 +109,16 @@ public final class HLSPackager {
     private void logProcessOutput(String processName) throws IOException {
         Process p = processes.get(processName);
 
-        BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-        ArrayList<String> list = new ArrayList<>();
-        String line;
-        while ((line = stdError.readLine()) != null) {
-            list.add(line);
-        }
-        String output = list.stream().map(Object::toString)
-                .collect(Collectors.joining("\\\n"));
+//        BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getInputStream()));
+//        ArrayList<String> list = new ArrayList<>();
+//        String line;
+//        while ((line = stdError.readLine()) != null) {
+//            list.add(line);
+//        }
+//        String output = list.stream().map(Object::toString)
+//                .collect(Collectors.joining("\\\n"));
+
+        String output = IOUtils.toString(p.getInputStream(), Charset.defaultCharset());
         System.out.println(output);
     }
 
@@ -123,6 +130,20 @@ public final class HLSPackager {
         ArrayList<String> list = new ArrayList<>();
         String line;
         while ((line = stdError.readLine()) != null) {
+            list.add(line);
+        }
+        return list.stream().map(Object::toString)
+                .collect(Collectors.joining("\n"));
+    }
+
+    private String getProcessOutput(String processName) throws IOException {
+        Process p = processes.get(processName);
+
+        BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+        ArrayList<String> list = new ArrayList<>();
+        String line;
+        while ((line = stdInput.readLine()) != null) {
             list.add(line);
         }
         return list.stream().map(Object::toString)

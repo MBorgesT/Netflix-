@@ -29,6 +29,9 @@ public class ContentManagementBusiness {
         if (packager.isVideoAlreadyBeingPackaged(fileName)) {
             throw new FileAlreadyExistsException(fileName + " is already being uploaded.");
         }
+        if (Files.exists(Path.of(LocalPaths.MEDIA_FOLDER + fileName + "/"))) {
+            throw new FileAlreadyExistsException(fileName + " already exists");
+        }
 
         try {
             saveFile(fileInputStream, fileName, fileExtension);
@@ -64,12 +67,12 @@ public class ContentManagementBusiness {
                                  String fileName, String fileExtension) throws IOException {
         String UPLOAD_PATH = LocalPaths.MEDIA_FOLDER + fileName + "/";
         try {
-            int read = 0;
             byte[] bytes = new byte[1024];
 
             Files.createDirectory(Path.of(UPLOAD_PATH));
 
-            OutputStream out = new FileOutputStream(new File(UPLOAD_PATH + "original" + fileExtension));
+            OutputStream out = new FileOutputStream(UPLOAD_PATH + "original" + fileExtension);
+            int read = 0;
             while ((read = fileInputStream.read(bytes)) != -1) {
                 out.write(bytes, 0, read);
             }
