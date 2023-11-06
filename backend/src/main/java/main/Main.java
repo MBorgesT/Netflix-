@@ -1,5 +1,6 @@
 package main;
 
+import jakarta.servlet.Servlet;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ResourceHandler;
@@ -7,7 +8,11 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.model.Resource;
-import tools.LocalPaths;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.proxy.ProxyServlet;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +22,9 @@ import java.nio.file.Path;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.glassfish.jersey.servlet.ServletContainer;
+import tools.LocalPaths;
 public class Main {
 
     public static final String BASE_URI = "http://localhost:8080/";
@@ -37,26 +45,30 @@ public class Main {
 
         createUploadFolder();
 
-        // scan packages
-        final ResourceConfig config = new ResourceConfig().packages("controller");
+//        // scan packages
+//        final ResourceConfig config = new ResourceConfig().packages("controller");
+//
+//        final Server server = JettyHttpContainerFactory.createServer(URI.create(BASE_URI), config, false);
+//        server.start();
 
-//        //1.Creating the resource handler
-//        ResourceHandler resourceHandler= new ResourceHandler();
-//        //2.Setting Resource Base
-//        resourceHandler.setResourceBase(LocalPaths.MEDIA_FOLDER);
-//        //3.Enabling Directory Listing
-//        resourceHandler.setDirectoriesListed(true);
-//        //4.Setting Context Source
-//        ContextHandler contextHandler = new ContextHandler("/resources");
-//        //5.Attaching Handlers
-//        contextHandler.setHandler(resourceHandler);
+        Server server = new Server(8080);
 
-        final Server server = JettyHttpContainerFactory.createServer(URI.create(BASE_URI), config, false);
-        //server.setHandler(contextHandler);
+        // Create a ServletContextHandler
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+        server.setHandler(context);
+
+        // Add your Jersey application as a servlet
+        ServletHolder jerseyServlet = context.addServlet(ServletContainer.class, "/api/*");
+        jerseyServlet.setInitOrder(0);
+        jerseyServlet.setInitParameter("jersey.config.server.provider.packages", "controller");
+
+        // Add a ProxyServlet for other resources (e.g., proxying to another service)
+        ServletHolder proxyServlet = context.addServlet(ProxyServlet.Transparent.class, "/resources/*");
+        proxyServlet.setInitParameter("proxyTo", "http://127.0.0.1:8081"); // Change the proxyTo URL as needed
+
         server.start();
-
         return server;
-
     }
 
     public static void main(String[] args) throws Exception {
