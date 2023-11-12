@@ -1,0 +1,12 @@
+<!-- hibernate.cfg.xml -->
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.driver_class">org.mariadb.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mariadb://172.19.0.2:3306/main</property>
+        <property name="hibernate.connection.username">admin</property>
+        <property name="hibernate.connection.password">admin</property>
+        <mapping class="model.User" />
+    </session-factory>
+</hibernate-configuration>
+
+

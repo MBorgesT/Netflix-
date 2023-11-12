@@ -1,30 +1,20 @@
 package main;
 
-import jakarta.servlet.Servlet;
-import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.model.Resource;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.proxy.ProxyServlet;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.glassfish.jersey.servlet.ServletContainer;
-import tools.LocalPaths;
+import utils.HibernateUtil;
+import utils.LocalPaths;
+
 public class Main {
 
     public static final String BASE_URI = "http://localhost:8080/";
@@ -71,9 +61,12 @@ public class Main {
         return server;
     }
 
+
     public static void main(String[] args) throws Exception {
 
         try {
+
+            HibernateUtil.init();
 
             final Server server = startServer();
 

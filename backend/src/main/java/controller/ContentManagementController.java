@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import projectExceptions.FileAlreadyUploadedException;
+import utils.AuthUtil;
 
 import java.io.*;
 import java.util.Map;
@@ -33,13 +34,18 @@ public class ContentManagementController {
 
     @GET
     @Path("/uploadStatuses")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response uploadStatues() {
+    public Response uploadStatues(@FormDataParam("authKey") String authKey) {
+        if (!AuthUtil.getInstance().isCodeAuthorized(authKey)) {
+            return Response.status(401).build();
+        }
+
         try {
             Map<String, String> map = ContentManagementBusiness.getUploadStatuses();
             return Response.status(Response.Status.OK).entity(map).build();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return Response.status(500).build();
         }
     }
 

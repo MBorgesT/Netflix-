@@ -1,9 +1,8 @@
 package business;
 
-import jakarta.ws.rs.WebApplicationException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import tools.HLSPackager;
-import tools.LocalPaths;
+import utils.HLSPackager;
+import utils.LocalPaths;
 
 import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
