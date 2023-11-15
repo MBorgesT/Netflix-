@@ -1,5 +1,9 @@
 package main;
 
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.SecurityHandler;
+import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -8,9 +12,12 @@ import org.eclipse.jetty.proxy.ProxyServlet;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.webapp.WebAppContext;
 import org.glassfish.jersey.servlet.ServletContainer;
 import utils.HibernateUtil;
 import utils.LocalPaths;
@@ -41,11 +48,12 @@ public class Main {
 //        final Server server = JettyHttpContainerFactory.createServer(URI.create(BASE_URI), config, false);
 //        server.start();
 
-        Server server = new Server(8080);
+        Server server = new Server(LocalPaths.SERVER_PORT);
 
         // Create a ServletContextHandler
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
+
         server.setHandler(context);
 
         // Add your Jersey application as a servlet
@@ -55,7 +63,25 @@ public class Main {
 
         // Add a ProxyServlet for other resources (e.g., proxying to another service)
         ServletHolder proxyServlet = context.addServlet(ProxyServlet.Transparent.class, "/resources/*");
-        proxyServlet.setInitParameter("proxyTo", "http://127.0.0.1:8081"); // Change the proxyTo URL as needed
+        proxyServlet.setInitParameter("proxyTo", LocalPaths.NGINX_ADDRESS); // Change the proxyTo URL as needed
+
+        server.start();
+        return server;
+    }
+
+    public static Server startServer2() throws Exception {
+        Server server = new Server(LocalPaths.SERVER_PORT);
+
+        // Define the context path and location of the webapp (where the web.xml is located)
+        String webappDir = "resources/"; // Replace this with the path to your webapp directory
+        String contextPath = "/"; // Context path specified in web.xml
+
+        WebAppContext webapp = new WebAppContext();
+        webapp.setContextPath(contextPath);
+        webapp.setDescriptor(webappDir + "web.xml");
+        webapp.setResourceBase(webappDir);
+
+        server.setHandler(webapp);
 
         server.start();
         return server;

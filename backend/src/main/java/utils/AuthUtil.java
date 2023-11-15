@@ -1,40 +1,19 @@
 package utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class AuthUtil {
 
-    private static AuthUtil instance;
-    private static int NCHARS = 30;
-    private static HashMap<String, String> hexAuths;
+    public static byte[] hashPassword(String password) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-    private AuthUtil() {
-        hexAuths = new HashMap<>();
-    }
+        // Add password bytes to digest
+        md.update(password.getBytes());
 
-    public static AuthUtil getInstance() {
-        if (instance == null) {
-            instance = new AuthUtil();
-        }
-        return instance;
-    }
-
-    public String newRandomHexString(String username){
-        Random r = new Random();
-        StringBuffer sb = new StringBuffer();
-        while(sb.length() < NCHARS){
-            sb.append(Integer.toHexString(r.nextInt()));
-        }
-
-        String newAuth = sb.toString().substring(0, NCHARS);
-        hexAuths.put(username, newAuth);
-        return newAuth;
-    }
-
-    public boolean isCodeAuthorized(String code) {
-        return hexAuths.containsValue(code);
+        // Get the hash's bytes
+        return md.digest();
     }
 
 }

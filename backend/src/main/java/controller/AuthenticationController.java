@@ -8,31 +8,40 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import projectExceptions.WrongCredentialsException;
+
+import java.security.NoSuchAlgorithmException;
 
 @Singleton
 @Path("/auth")
 public class AuthenticationController {
 
     @POST
-    @Path("/login")
+    @Path("/subscriberLogin")
     @Consumes({MediaType.MULTIPART_FORM_DATA})
-    public Response login(@FormDataParam("username") String username,
+    public Response subscriberLogin(@FormDataParam("username") String username,
                             @FormDataParam("password") String password) {
         try {
-            String authCode = AuthenticationBusiness.login(username, password);
-            return Response.ok(authCode).build();
-        } catch (WrongCredentialsException e) {
-            return Response.status(401, "Wrong credentials").build();
+            String msg;
+            if (AuthenticationBusiness.subscriberLogin(username, password)) {
+                return Response.ok("Welcome!").build();
+            } else {
+                return Response.status(401, "Wrong credentials").build();
+            }
+        } catch (Exception e) {
+            return Response.status(500).build();
         }
     }
 
     @POST
-    @Path("/newUser")
+    @Path("/newSubscriber")
     @Consumes({MediaType.MULTIPART_FORM_DATA})
-    public Response newUser(@FormDataParam("username") String username,
+    public Response newSubscriber(@FormDataParam("username") String username,
                                 @FormDataParam("password") String password) {
-        return Response.ok(AuthenticationBusiness.newUser(username, password)).build();
+        try {
+            return Response.ok(AuthenticationBusiness.newSubscriber(username, password)).build();
+        } catch (NoSuchAlgorithmException e) {
+            return Response.status(500).build();
+        }
     }
 
 }

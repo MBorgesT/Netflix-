@@ -4,13 +4,14 @@ import model.User;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
-import projectExceptions.WrongCredentialsException;
 import utils.AuthUtil;
 import utils.HibernateUtil;
 
+import java.security.NoSuchAlgorithmException;
+
 public class AuthenticationBusiness {
 
-    public static String newUser(String username, String password) {
+    public static String newSubscriber(String username, String password) throws NoSuchAlgorithmException {
         Session session = HibernateUtil.openSession();
 
         Query query = session.createQuery("from User where username =:username ")
@@ -23,29 +24,27 @@ public class AuthenticationBusiness {
         Transaction transaction = session.beginTransaction();
 
         try {
-            User newUser = new User(username, password);
+            byte[] hashedPassword = AuthUtil.hashPassword(password);
+            User newUser = new User(username, hashedPassword, User.Role.SUBSCRIBER);
             session.persist(newUser);
             transaction.commit();
 
-            return "New user created";
+            return "New subscriber created";
         } catch (Exception e) {
             transaction.rollback();
             throw e;
         }
     }
 
-    public static String login(String username, String password) throws WrongCredentialsException {
+    public static boolean subscriberLogin(String username, String password) throws NoSuchAlgorithmException {
         Session session = HibernateUtil.openSession();
 
+        byte[] hashedPassword = AuthUtil.hashPassword(password);
         Query query = session.createQuery("from User where username=:username " +
                         "and password=:password ")
                         .setParameter("username", username)
-                        .setParameter("password", password);
+                        .setParameter("password", hashedPassword);
         User exists = (User) query.uniqueResult();
-        if (exists == null) {
-            throw new WrongCredentialsException("Invalid credentials");
-        }
-
-        return AuthUtil.getInstance().newRandomHexString(username);
+        return exists != null;
     }
 }

@@ -36,11 +36,7 @@ public class ContentManagementController {
     @Path("/uploadStatuses")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response uploadStatues(@FormDataParam("authKey") String authKey) {
-        if (!AuthUtil.getInstance().isCodeAuthorized(authKey)) {
-            return Response.status(401).build();
-        }
-
+    public Response uploadStatuses() {
         try {
             Map<String, String> map = ContentManagementBusiness.getUploadStatuses();
             return Response.status(Response.Status.OK).entity(map).build();
