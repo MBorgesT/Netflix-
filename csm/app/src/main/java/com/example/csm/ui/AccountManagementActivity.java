@@ -20,57 +20,40 @@ public class AccountManagementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_management);
 
-        new AsyncPopulateAdminList(this).execute();
-        new AsyncPopulateSubscriberList(this).execute();
+        new AsyncPopulateLists(this).execute();
+        //new AsyncPopulateSubscriberList(this).execute();
     }
 
-    private class AsyncPopulateAdminList extends AsyncTask<Void, Void, List<User>> {
+    private class AsyncPopulateLists extends AsyncTask<Void, Void, List[]> {
 
         Activity context;
 
-        public AsyncPopulateAdminList(Activity context) {
+        public AsyncPopulateLists(Activity context) {
             this.context = context;
         }
+
         @Override
-        protected List<User> doInBackground(Void... params) {
+        protected List[] doInBackground(Void... params) {
             try {
-                return UserDAO.getAdminsInfo();
+                List<User> admins = UserDAO.getAdminsInfo();
+                List<User> subs = UserDAO.getSubscribersInfo();
+
+                return new List[]{admins, subs};
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
 
         @Override
-        protected void onPostExecute(List<User> result) {
-            UserListAdapter adapter = new UserListAdapter(context, result);
+        protected void onPostExecute(List[] userLists) {
+            UserListAdapter adapter = new UserListAdapter(context, userLists[0]);
             ListView adminsListView = findViewById(R.id.listAdmins);
             adminsListView.setAdapter(adapter);
-        }
-    }
 
-    private class AsyncPopulateSubscriberList extends AsyncTask<Void, Void, List<User>> {
-
-        Activity context;
-
-        public AsyncPopulateSubscriberList(Activity context) {
-            this.context = context;
-        }
-        @Override
-        protected List<User> doInBackground(Void... params) {
-            try {
-                return UserDAO.getSubscribersInfo();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(List<User> result) {
-            UserListAdapter adapter = new UserListAdapter(context, result);
+            adapter = new UserListAdapter(context, userLists[1]);
             ListView subsListView = findViewById(R.id.listSubscribers);
             subsListView.setAdapter(adapter);
         }
     }
-
 
 }
