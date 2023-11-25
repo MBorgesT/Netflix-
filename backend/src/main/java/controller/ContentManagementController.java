@@ -19,7 +19,7 @@ public class ContentManagementController {
 
     @POST
     @Path("/uploadMedia")
-    @Consumes({MediaType.MULTIPART_FORM_DATA})
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadMedia(@FormDataParam("file") InputStream fileInputStream,
                                   @FormDataParam("file") FormDataContentDisposition fileMetaData) {
         try {
@@ -32,6 +32,7 @@ public class ContentManagementController {
         }
     }
 
+    // TODO: Make upload statuses a model and serialize the list of them here in the controller
     @GET
     @Path("/uploadStatuses")
     @Produces(MediaType.APPLICATION_JSON)

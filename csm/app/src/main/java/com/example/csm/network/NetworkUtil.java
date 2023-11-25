@@ -1,4 +1,4 @@
-package com.example.client.network;
+package com.example.csm.network;
 
 import android.content.Context;
 
@@ -40,7 +40,7 @@ public class NetworkUtil {
                 case HttpURLConnection.HTTP_UNAUTHORIZED:
                     // Handle unauthorized access (HTTP 401)
                     // For example, show a message or redirect to a login screen
-                    return "Wrong credentials";
+                    return "Unauthorized access";
                 case HttpURLConnection.HTTP_NOT_FOUND:
                     // Handle resource not found (HTTP 404)
                     return "Resource not found";
