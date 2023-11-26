@@ -1,4 +1,4 @@
-package com.example.csm.ui;
+package com.example.csm.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,7 +12,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.csm.R;
-import com.example.csm.network.NetworkUtil;
+import com.example.csm.util.NetworkUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +28,11 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         messageBoard = (TextView) findViewById(R.id.textMessage);
+    }
+
+    public void login() {
+        Intent newIntent = new Intent(this, MainMenuActivity.class);
+        this.startActivity(newIntent);
     }
 
     // TODO: use DAO

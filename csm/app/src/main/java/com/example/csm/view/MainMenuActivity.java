@@ -1,4 +1,4 @@
-package com.example.csm.ui;
+package com.example.csm.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
