@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">csm</string>
+    <string name="backend_address">http://192.168.1.68:8080/</string>
 </resources>

@@ -1,6 +1,6 @@
 package controller;
 
-import business.AuthenticationBusiness;
+import business.UserManagementBusiness;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -31,7 +31,7 @@ public class AuthenticationController {
             String username = jsonObject.getString("username");
             String password = jsonObject.getString("password");
 
-            if (AuthenticationBusiness.login(username, password, false)) {
+            if (UserManagementBusiness.login(username, password, false)) {
                 return Response.ok().entity("{\"message\": \"Welcome!\"}").build();
             } else {
                 return Response.status(401).entity("{\"message\": \"Wrong credentials\"}").build();
@@ -59,11 +59,11 @@ public class AuthenticationController {
             String username = jsonObject.getString("username");
             String password = jsonObject.getString("password");
 
-            if (AuthenticationBusiness.doesUserExist(username)) {
+            if (UserManagementBusiness.doesUserExist(username)) {
                 return Response.status(400).entity("Username already in use").build();
             }
 
-            AuthenticationBusiness.newUser(username, password, false);
+            UserManagementBusiness.newUser(username, password, false);
             return Response.ok().entity("{\"message\": \"New subscriber created!\"}").build();
         } catch (JSONException e) {
             return Response.status(400).entity("Invalid JSON payload").build();
@@ -88,7 +88,7 @@ public class AuthenticationController {
             String username = jsonObject.getString("username");
             String password = jsonObject.getString("password");
 
-            if (AuthenticationBusiness.login(username, password, true)) {
+            if (UserManagementBusiness.login(username, password, true)) {
                 return Response.ok().entity("{\"message\": \"Welcome!\"}").build();
             } else {
                 return Response.status(401).entity("{\"message\": \"Wrong credentials\"}").build();
@@ -116,11 +116,11 @@ public class AuthenticationController {
             String username = jsonObject.getString("username");
             String password = jsonObject.getString("password");
 
-            if (AuthenticationBusiness.doesUserExist(username)) {
+            if (UserManagementBusiness.doesUserExist(username)) {
                 return Response.status(400).entity("Username already in use").build();
             }
 
-            AuthenticationBusiness.newUser(username, password, true);
+            UserManagementBusiness.newUser(username, password, true);
             return Response.ok().entity("{\"message\": \"New admin created!\"}").build();
         } catch (JSONException e) {
             return Response.status(400).entity("Invalid JSON payload").build();
