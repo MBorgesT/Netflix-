@@ -9,6 +9,7 @@
     tools:context=".view.AccountManagementActivity">
 
     <Button
+        android:onClick="onClickButtonNewUser"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginBottom="16dp"

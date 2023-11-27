@@ -3,7 +3,9 @@ package com.example.csm.view;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -60,4 +62,8 @@ public class AccountManagementActivity extends AppCompatActivity implements User
         viewModel.deleteUser(userId);
     }
 
+    public void onClickButtonNewUser(View view) {
+        Intent newIntent = new Intent(this, NewUserFormActivity.class);
+        this.startActivity(newIntent);
+    }
 }

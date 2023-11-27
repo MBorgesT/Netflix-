@@ -15,11 +15,16 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface UserAPI {
-    @GET("userManagement/getAdminsInfo/")
+    @GET("userManagement/getAdminsInfo")
     Call<List<User>> getAdminsInfo();
 
-    @GET("userManagement/getSubscribersInfo/")
+    @GET("userManagement/getSubscribersInfo")
     Call<List<User>> getSubscribersInfo();
+
+    @POST("userManagement/newUser")
+    Call<ResponseBody> newUser(@Path("username") String username,
+                               @Path("password") String password,
+                               @Path("role") User.Role role);
 
     @DELETE("userManagement/deleteUser/{userId}")
     Call<ResponseBody> deleteUser(@Path("userId") int userId);

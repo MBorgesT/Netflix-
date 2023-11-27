@@ -1,10 +1,12 @@
 package business;
 
+import exceptions.EmptyParameterException;
+import exceptions.InvalidRoleException;
 import model.User;
+import org.apache.commons.lang3.EnumUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
-import org.json.JSONObject;
 import utils.AuthUtil;
 import utils.HibernateUtil;
 
@@ -60,13 +62,19 @@ public class UserManagementBusiness {
         return exists != null;
     }
 
-    public static void newUser(String username, String password, boolean isAdmin) throws NoSuchAlgorithmException {
+    public static void newUser(String username, String password, String role) throws NoSuchAlgorithmException, InvalidRoleException, EmptyParameterException {
+        if (username.isEmpty() || password.isEmpty() || role.isEmpty()) {
+            throw new EmptyParameterException();
+        }
+        if (!EnumUtils.isValidEnum(User.Role.class, role)) {
+            throw new InvalidRoleException();
+        }
+
         Session session = HibernateUtil.openSession();
         Transaction transaction = session.beginTransaction();
 
         byte[] hashedPassword = AuthUtil.hashPassword(password);
-        User newUser = new User(username, hashedPassword,
-                isAdmin ? User.Role.ADMIN : User.Role.SUBSCRIBER);
+        User newUser = new User(username, hashedPassword, User.Role.valueOf(role));
         try {
             session.persist(newUser);
             transaction.commit();

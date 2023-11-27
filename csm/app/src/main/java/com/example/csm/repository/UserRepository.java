@@ -126,6 +126,20 @@ public class UserRepository {
         });
     }
 
+    public void newUser(String username, String password, User.Role role) {
+        api.newUser(username, password, role).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
     public void deleteUser(int userId) {
         api.deleteUser(userId).enqueue(new Callback<ResponseBody>() {
             @Override
