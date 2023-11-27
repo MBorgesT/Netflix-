@@ -13,26 +13,30 @@ import java.util.List;
 public class AccountManagementViewModel extends ViewModel {
 
     private UserRepository userRepository;
-    private MutableLiveData<List<User>> admins;
-    private MutableLiveData<List<User>> subs;
 
     public AccountManagementViewModel() {
-        admins = new MutableLiveData<>();
-        subs = new MutableLiveData<>();
         userRepository = UserRepository.getInstance();
     }
 
-    public LiveData<List<User>> getAdmins() {
-        return admins;
+    public MutableLiveData<String> getMessageLiveData() {
+        return userRepository.getMessageLiveData();
     }
 
-    public LiveData<List<User>> getSubscribers() {
-        return subs;
+    public LiveData<List<User>> getAdminsLiveData() {
+        return userRepository.getAdminsLiveData();
+    }
+
+    public LiveData<List<User>> getSubscribersLiveData() {
+        return userRepository.getSubscribersLiveData();
     }
 
     public void fetchData() {
-        admins = userRepository.fetchAdminsInfo();
-        subs = userRepository.fetchSubscribersInfo();
+        userRepository.fetchAdminsInfo();
+        userRepository.fetchSubscribersInfo();
+    }
+
+    public void deleteUser(int userId) {
+        userRepository.deleteUser(userId);
     }
 
 }

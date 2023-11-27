@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,12 @@ import java.util.List;
 
 public class UserListAdapter extends ArrayAdapter<User> {
 
+    public interface OnUserDeleteListener {
+        void onDeleteUser(int userId);
+    }
+
+    private OnUserDeleteListener deleteListener;
+
     private Context mContext;
     private List<User> mData;
 
@@ -24,6 +31,10 @@ public class UserListAdapter extends ArrayAdapter<User> {
         super(context, R.layout.activity_user_list_item, data);
         this.mContext = context;
         this.mData = data;
+    }
+
+    public void setOnUserDeleteListener(OnUserDeleteListener listener) {
+        this.deleteListener = listener;
     }
 
     @NonNull
@@ -34,10 +45,16 @@ public class UserListAdapter extends ArrayAdapter<User> {
             convertView = inflater.inflate(R.layout.activity_user_list_item, parent, false);
         }
 
-        convertView.setId(mData.get(position).getId());
-
         TextView textView = convertView.findViewById(R.id.textFieldUsername);
         textView.setText(mData.get(position).getUsername());
+
+        Button deleteButton = convertView.findViewById(R.id.buttonDelete);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteListener.onDeleteUser(mData.get(position).getId());
+            }
+        });
 
         return convertView;
     }

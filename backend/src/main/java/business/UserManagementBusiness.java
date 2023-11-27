@@ -80,9 +80,12 @@ public class UserManagementBusiness {
 
     public static void deleteUser(int id) {
         Session session = HibernateUtil.openSession();
+        Transaction transaction = session.beginTransaction();
+
         User toDelete = session.get(User.class, id);
         session.delete(toDelete);
-        session.getTransaction().commit();
+
+        transaction.commit();
         session.close();
     }
 

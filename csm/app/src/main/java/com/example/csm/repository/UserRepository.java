@@ -19,9 +19,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class UserRepository {
     private static final String TAG = "UserRepository";
@@ -50,6 +48,14 @@ public class UserRepository {
             instance = new UserRepository();
         }
         return instance;
+    }
+
+    public static MutableLiveData<List<User>> getAdminsLiveData() {
+        return adminsLiveData;
+    }
+
+    public static MutableLiveData<List<User>> getSubscribersLiveData() {
+        return subscribersLiveData;
     }
 
     public MutableLiveData<String> getMessageLiveData() {
@@ -91,7 +97,7 @@ public class UserRepository {
         return userAuthenticatedLiveData;
     }
 
-    public MutableLiveData<List<User>> fetchAdminsInfo() {
+    public void fetchAdminsInfo() {
         api.getAdminsInfo().enqueue(new Callback<List<User>>() {
             @Override
             public void onResponse(@NonNull Call<List<User>> call, @NonNull Response<List<User>> response) {
@@ -103,10 +109,9 @@ public class UserRepository {
                 Log.d(TAG, "onFailure: failed to get admins");
             }
         });
-        return adminsLiveData;
     }
 
-    public MutableLiveData<List<User>> fetchSubscribersInfo() {
+    public void fetchSubscribersInfo() {
         api.getSubscribersInfo().enqueue(new Callback<List<User>>() {
             @Override
             public void onResponse(@NonNull Call<List<User>> call, @NonNull Response<List<User>> response) {
@@ -119,7 +124,26 @@ public class UserRepository {
                 Log.d(TAG, "onFailure: failed to get admins");
             }
         });
-        return subscribersLiveData;
+    }
+
+    public void deleteUser(int userId) {
+        api.deleteUser(userId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.code() == 200) {
+                    fetchAdminsInfo();
+                    fetchSubscribersInfo();
+                    messageLiveData.setValue(response.message());
+                } else {
+                    messageLiveData.setValue("Error deleting user");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                messageLiveData.setValue("Error deleting user");
+            }
+        });
     }
 
 }

@@ -5,11 +5,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.csm.R;
 import com.example.csm.viewmodel.AccountManagementViewModel;
 
-public class AccountManagementActivity extends AppCompatActivity {
+public class AccountManagementActivity extends AppCompatActivity implements UserListAdapter.OnUserDeleteListener{
 
     private AccountManagementViewModel viewModel;
 
@@ -21,54 +22,42 @@ public class AccountManagementActivity extends AppCompatActivity {
         ViewModelProvider viewModelProvider = new ViewModelProvider(this);
         viewModel = viewModelProvider.get(AccountManagementViewModel.class);
 
+        setupToast();
+        setupListAdapters();
         populateLists();
     }
 
-    private void populateLists() {
-        viewModel.fetchData();
+    private void setupToast() {
+        viewModel.getMessageLiveData().observe(this, message -> {
+            if (message != null) {
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                viewModel.getMessageLiveData().setValue(null);
+            }
+        });
+    }
 
-        viewModel.getAdmins().observe(this, adminsList -> {
+    private void setupListAdapters() {
+        viewModel.getAdminsLiveData().observe(this, adminsList -> {
             UserListAdapter adapter = new UserListAdapter(this, adminsList);
+            adapter.setOnUserDeleteListener(this);
             ListView adminsListView = findViewById(R.id.listAdmins);
             adminsListView.setAdapter(adapter);
         });
-        viewModel.getSubscribers().observe(this, subsList -> {
+        viewModel.getSubscribersLiveData().observe(this, subsList -> {
             UserListAdapter adapter = new UserListAdapter(this, subsList);
+            adapter.setOnUserDeleteListener(this);
             ListView subsListView = findViewById(R.id.listSubscribers);
             subsListView.setAdapter(adapter);
         });
     }
 
-//    private class AsyncPopulateLists extends AsyncTask<Void, Void, List[]> {
-//
-//        Activity context;
-//
-//        public AsyncPopulateLists(Activity context) {
-//            this.context = context;
-//        }
-//
-//        @Override
-//        protected List[] doInBackground(Void... params) {
-//            try {
-//                List<User> admins = UserHandler.getAdminsInfo();
-//                List<User> subs = UserHandler.getSubscribersInfo();
-//
-//                return new List[]{admins, subs};
-//            } catch (Exception e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(List[] userLists) {
-//            UserListAdapter adapter = new UserListAdapter(context, userLists[0]);
-//            ListView adminsListView = findViewById(R.id.listAdmins);
-//            adminsListView.setAdapter(adapter);
-//
-//            adapter = new UserListAdapter(context, userLists[1]);
-//            ListView subsListView = findViewById(R.id.listSubscribers);
-//            subsListView.setAdapter(adapter);
-//        }
-//    }
+    private void populateLists() {
+        viewModel.fetchData();
+    }
+
+    @Override
+    public void onDeleteUser(int userId) {
+        viewModel.deleteUser(userId);
+    }
 
 }

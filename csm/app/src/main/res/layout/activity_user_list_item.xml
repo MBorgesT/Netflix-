@@ -12,13 +12,14 @@
         android:layout_weight="14" />
 
     <Button
+        android:id="@+id/buttonEdit"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="3"
         android:text="E" />
 
     <Button
-        android:onClick="onClickButtonDelete"
+        android:id="@+id/buttonDelete"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="3"

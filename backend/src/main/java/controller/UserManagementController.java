@@ -47,28 +47,17 @@ public class UserManagementController {
         }
     }
 
-    @POST
-    @Path("/deleteUser")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteUser(String jsonPayload) {
+    @DELETE
+    @Path("/deleteUser/{userId}")
+    //@Produces(MediaType.APPLICATION_JSON)
+    public Response deleteUser(@PathParam("userId") int userId) {
         try {
-            JSONObject jsonObject = new JSONObject(jsonPayload);
-
-            if (!jsonObject.has("id")) {
-                return Response.status(400).entity("Id missing").build();
-            }
-
-            int id = jsonObject.getInt("id");
-
-            if (!UserManagementBusiness.doesUserExist(id)) {
+            if (!UserManagementBusiness.doesUserExist(userId)) {
                 return Response.status(400).entity("User with the specified id does not exist").build();
             }
 
-            UserManagementBusiness.deleteUser(id);
-            return Response.ok().entity("{\"message\": \"New admin created!\"}").build();
-        } catch (JSONException e) {
-            return Response.status(400).entity("Invalid JSON payload").build();
+            UserManagementBusiness.deleteUser(userId);
+            return Response.ok().entity("User successfully deleted").build();
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(500).entity("Internal Server Error").build();

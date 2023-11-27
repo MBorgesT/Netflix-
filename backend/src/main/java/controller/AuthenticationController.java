@@ -32,9 +32,9 @@ public class AuthenticationController {
             String password = jsonObject.getString("password");
 
             if (UserManagementBusiness.login(username, password, false)) {
-                return Response.ok().entity("{\"message\": \"Welcome!\"}").build();
+                return Response.ok().entity("Welcome!").build();
             } else {
-                return Response.status(401).entity("{\"message\": \"Wrong credentials\"}").build();
+                return Response.status(401).entity("Wrong credentials").build();
             }
         } catch (JSONException e) {
             return Response.status(400).entity("Invalid JSON payload").build();
@@ -64,7 +64,7 @@ public class AuthenticationController {
             }
 
             UserManagementBusiness.newUser(username, password, false);
-            return Response.ok().entity("{\"message\": \"New subscriber created!\"}").build();
+            return Response.ok().entity("New subscriber created").build();
         } catch (JSONException e) {
             return Response.status(400).entity("Invalid JSON payload").build();
         } catch (Exception e) {
@@ -89,9 +89,9 @@ public class AuthenticationController {
             String password = jsonObject.getString("password");
 
             if (UserManagementBusiness.login(username, password, true)) {
-                return Response.ok().entity("{\"message\": \"Welcome!\"}").build();
+                return Response.ok().entity("Welcome!").build();
             } else {
-                return Response.status(401).entity("{\"message\": \"Wrong credentials\"}").build();
+                return Response.status(401).entity("Wrong credentials").build();
             }
         } catch (JSONException e) {
             return Response.status(400).entity("Invalid JSON payload").build();
