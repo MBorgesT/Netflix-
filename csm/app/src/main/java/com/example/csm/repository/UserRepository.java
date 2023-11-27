@@ -3,45 +3,46 @@ package com.example.csm.repository;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-//import com.android.volley.Request;
-//import com.android.volley.RequestQueue;
-//import com.android.volley.Response;
-//import com.android.volley.VolleyError;
-//import com.android.volley.toolbox.StringRequest;
 import com.example.csm.api.UserAPI;
 import com.example.csm.model.User;
 import com.example.csm.util.ApiBuilder;
-import com.example.csm.util.NetworkUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-//import retrofit2.Response;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class UserRepository extends Repository {
+public class UserRepository {
     private static final String TAG = "UserRepository";
 
     private static UserRepository instance;
+    private final UserAPI api;
 
-    protected static final String controllerPath = "api/";
-    private UserAPI api;
-
+    // USER MANAGEMENT
     private static MutableLiveData<List<User>> adminsLiveData;
     private static MutableLiveData<List<User>> subscribersLiveData;
+
+    // LOGIN
+    private MutableLiveData<String> messageLiveData;
+    private static MutableLiveData<Boolean> userAuthenticatedLiveData;
 
     private UserRepository() {
         api = ApiBuilder.create(UserAPI.class);
         adminsLiveData = new MutableLiveData<>();
         subscribersLiveData = new MutableLiveData<>();
+        messageLiveData = new MutableLiveData<>();
+        userAuthenticatedLiveData = new MutableLiveData<>();
     };
 
     public static UserRepository getInstance() {
@@ -49,6 +50,45 @@ public class UserRepository extends Repository {
             instance = new UserRepository();
         }
         return instance;
+    }
+
+    public MutableLiveData<String> getMessageLiveData() {
+        return messageLiveData;
+    }
+
+    public MutableLiveData<Boolean> getUserAuthenticatedLiveData() {
+        return userAuthenticatedLiveData;
+    }
+
+    public MutableLiveData<Boolean> adminLogin(String username, String password) {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("username", username);
+            json.put("password", password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            messageLiveData.setValue("Error on authentication");
+            userAuthenticatedLiveData.setValue(false);
+            return userAuthenticatedLiveData;
+        }
+
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json.toString());
+        api.adminLogin(requestBody).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                messageLiveData.setValue(response.message());
+                userAuthenticatedLiveData.setValue(response.code() == 200);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                t.printStackTrace();
+                messageLiveData.setValue("Error on connecting to server");
+                userAuthenticatedLiveData.setValue(false);
+            }
+        });
+
+        return userAuthenticatedLiveData;
     }
 
     public MutableLiveData<List<User>> fetchAdminsInfo() {
@@ -81,66 +121,5 @@ public class UserRepository extends Repository {
         });
         return subscribersLiveData;
     }
-
-//    public static MutableLiveData<List<User>> fetchUserInfo(User.Role role) throws Exception {
-//        //resultLiveData = new MutableLiveData<>();
-//        String roleStr;
-//        switch (role) {
-//            case ADMIN:
-//                roleStr = "Admins";
-//                break;
-//            case SUBSCRIBER:
-//                roleStr = "Subscribers";
-//                break;
-//            default:
-//                throw new Exception("Not a valid role");
-//        }
-//
-//        String url = buildUrl(controllerPath, "userManagement/get" + roleStr + "Info");
-//        RequestQueue queue = NetworkUtil.getInstance().getRequestQueue();
-//
-//        StringRequest request = new StringRequest(Request.Method.GET, url,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        // Handle successful response
-//                        ObjectMapper mapper = new ObjectMapper();
-//                        try {
-//                            List<User> users = mapper.readValue(response, new TypeReference<List<User>>() {});
-//                            switch (role) {
-//                                case ADMIN:
-//                                    adminsLiveData.setValue(users);
-//                                    break;
-//                                case SUBSCRIBER:
-//                                    subscribersLiveData.setValue(users);
-//                                    break;
-//                            }
-//                        } catch (JsonProcessingException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//                    }
-//                }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                switch (role) {
-//                    case ADMIN:
-//                        adminsLiveData.setValue(new ArrayList<>());
-//                        break;
-//                    case SUBSCRIBER:
-//                        subscribersLiveData.setValue(new ArrayList<>());
-//                        break;
-//                }
-//            }
-//        });
-//
-//        queue.add(request);
-//        switch (role) {
-//            case ADMIN:
-//                return adminsLiveData;
-//            case SUBSCRIBER:
-//                return subscribersLiveData;
-//        }
-//        return null;
-//    }
 
 }
