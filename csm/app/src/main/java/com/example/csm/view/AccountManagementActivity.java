@@ -1,7 +1,6 @@
 package com.example.csm.view;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +10,7 @@ import android.widget.Toast;
 
 import com.example.csm.R;
 import com.example.csm.viewmodel.AccountManagementViewModel;
+import com.example.csm.viewmodel.SharedViewModelSource;
 
 public class AccountManagementActivity extends AppCompatActivity implements UserListAdapter.OnUserDeleteListener{
 
@@ -21,8 +21,9 @@ public class AccountManagementActivity extends AppCompatActivity implements User
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_management);
 
-        ViewModelProvider viewModelProvider = new ViewModelProvider(this);
-        viewModel = viewModelProvider.get(AccountManagementViewModel.class);
+//        ViewModelProvider viewModelProvider = new ViewModelProvider(this);
+//        viewModel = viewModelProvider.get(AccountManagementViewModel.class);
+        viewModel = SharedViewModelSource.getAccountManagementViewModel(this);
 
         setupToast();
         setupListAdapters();
@@ -66,4 +67,5 @@ public class AccountManagementActivity extends AppCompatActivity implements User
         Intent newIntent = new Intent(this, UserFormActivity.class);
         this.startActivity(newIntent);
     }
+
 }

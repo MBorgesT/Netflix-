@@ -1,7 +1,6 @@
 package com.example.csm.view;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
 import android.view.View;
@@ -11,6 +10,7 @@ import android.widget.RadioGroup;
 import com.example.csm.R;
 import com.example.csm.model.User;
 import com.example.csm.viewmodel.AccountManagementViewModel;
+import com.example.csm.viewmodel.SharedViewModelSource;
 
 public class UserFormActivity extends AppCompatActivity {
 
@@ -24,7 +24,7 @@ public class UserFormActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_form);
 
-        viewModel = new ViewModelProvider(this).get(AccountManagementViewModel.class);
+        viewModel = SharedViewModelSource.getAccountManagementViewModel(this);
 
         usernameTextView = findViewById(R.id.editTextUsername);
         passwordEditText = findViewById(R.id.editTextPassword);
