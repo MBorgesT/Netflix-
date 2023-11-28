@@ -26,7 +26,7 @@ public class AccountManagementActivity extends AppCompatActivity implements User
 
         setupToast();
         setupListAdapters();
-        populateLists();
+        fetchUsers();
     }
 
     private void setupToast() {
@@ -53,8 +53,8 @@ public class AccountManagementActivity extends AppCompatActivity implements User
         });
     }
 
-    private void populateLists() {
-        viewModel.fetchData();
+    private void fetchUsers() {
+        viewModel.fetchUsers();
     }
 
     @Override
@@ -63,7 +63,7 @@ public class AccountManagementActivity extends AppCompatActivity implements User
     }
 
     public void onClickButtonNewUser(View view) {
-        Intent newIntent = new Intent(this, NewUserFormActivity.class);
+        Intent newIntent = new Intent(this, UserFormActivity.class);
         this.startActivity(newIntent);
     }
 }

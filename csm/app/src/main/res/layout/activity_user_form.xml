@@ -9,7 +9,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="48dp"
-    tools:context=".view.LoginActivity">
+    tools:context=".view.UserFormActivity">
 
     <EditText
         android:id="@+id/editTextUsername"
@@ -49,11 +49,11 @@
 
     <Button
         android:id="@+id/buttonNewUser"
-        android:onClick="onClickButtonLogin"
+        android:onClick="onClickButtonNewUser"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Login" />
+        android:text="New User" />
 
     <TextView
         android:id="@+id/textMessage"

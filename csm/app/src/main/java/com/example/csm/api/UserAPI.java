@@ -22,9 +22,7 @@ public interface UserAPI {
     Call<List<User>> getSubscribersInfo();
 
     @POST("userManagement/newUser")
-    Call<ResponseBody> newUser(@Path("username") String username,
-                               @Path("password") String password,
-                               @Path("role") User.Role role);
+    Call<ResponseBody> newUser(@Body RequestBody body);
 
     @DELETE("userManagement/deleteUser/{userId}")
     Call<ResponseBody> deleteUser(@Path("userId") int userId);

@@ -42,7 +42,7 @@ public class UserManagementController {
             }
 
             UserManagementBusiness.newUser(username, password, role);
-            return Response.ok().entity("New user created!").build();
+            return Response.status(201).entity("New user created!").build();
         } catch (JSONException e) {
             return Response.status(400).entity("Invalid JSON payload").build();
         } catch (EmptyParameterException e) {

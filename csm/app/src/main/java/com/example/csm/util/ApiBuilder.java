@@ -1,5 +1,10 @@
 package com.example.csm.util;
 
+
+import android.app.Application;
+import android.content.Context;
+
+import com.example.csm.R;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -9,7 +14,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiBuilder {
-    public static final String BASE_URL = "http://192.168.1.68:8080/api/";
 
     public static <T> T create(final Class<T> serviceInterface) {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
@@ -20,7 +24,7 @@ public class ApiBuilder {
         Gson gson = new GsonBuilder().create();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(Resources.backendApiUrl)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();

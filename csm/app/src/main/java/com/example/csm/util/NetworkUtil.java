@@ -8,6 +8,7 @@ import com.android.volley.toolbox.Volley;
 
 import java.net.HttpURLConnection;
 
+// TODO: delete this
 public class NetworkUtil {
 
     private static NetworkUtil instance;
