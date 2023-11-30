@@ -53,8 +53,9 @@ public class AccountManagementViewModel extends ViewModel {
     }
 
     public void newUser(String username, String password, User.Role role) {
+        User toCreate = new User(username, password, role);
         userFormSuccessLiveData.setValue(false);
-        userRepository.newUser(username, password, role, onUserCreateOrUpdateListener);
+        userRepository.newUser(toCreate, onUserCreateOrUpdateListener);
     }
 
     public void updateUser(int id, String username, String password, User.Role role) {

@@ -153,12 +153,12 @@ public class UserRepository extends Application {
         });
     }
 
-    public void newUser(String username, String password, User.Role role, OnUserCreateOrUpdateListener listener) {
+    public void newUser(User user, OnUserCreateOrUpdateListener listener) {
         JSONObject json = new JSONObject();
         try {
-            json.put("username", username);
-            json.put("password", password);
-            json.put("role", role.toString());
+            json.put("username", user.getUsername());
+            json.put("password", user.getPassword());
+            json.put("role", user.getRole().toString());
         } catch (JSONException e) {
             e.printStackTrace();
             messageLiveData.setValue("Error on JSON creation");
