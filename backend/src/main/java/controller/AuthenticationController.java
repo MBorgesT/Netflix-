@@ -44,35 +44,6 @@ public class AuthenticationController {
         }
     }
 
-//    @POST
-//    @Path("/newSubscriber")
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response newSubscriber(String jsonPayload) {
-//        try {
-//            JSONObject jsonObject = new JSONObject(jsonPayload);
-//
-//            if (!jsonObject.has("username") || !jsonObject.has("password")) {
-//                return Response.status(400).entity("Username or password missing").build();
-//            }
-//
-//            String username = jsonObject.getString("username");
-//            String password = jsonObject.getString("password");
-//
-//            if (UserManagementBusiness.doesUserExist(username)) {
-//                return Response.status(400).entity("Username already in use").build();
-//            }
-//
-//            UserManagementBusiness.newUser(username, password, false);
-//            return Response.ok().entity("New subscriber created").build();
-//        } catch (JSONException e) {
-//            return Response.status(400).entity("Invalid JSON payload").build();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return Response.status(500).entity("Internal Server Error").build();
-//        }
-//    }
-
     @POST
     @Path("/adminLogin")
     @Consumes(MediaType.APPLICATION_JSON)

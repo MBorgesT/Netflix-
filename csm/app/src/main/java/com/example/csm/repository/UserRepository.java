@@ -1,7 +1,6 @@
 package com.example.csm.repository;
 
 import android.app.Application;
-import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -25,8 +24,8 @@ import java.util.List;
 
 public class UserRepository extends Application {
 
-    public interface OnUserCreateListener {
-        void onUserCreate(String message, boolean success);
+    public interface OnUserCreateOrUpdateListener {
+        void onUserCreateOrUpdate(String message, boolean success);
     }
 
     public interface OnUsersFetchListener {
@@ -127,7 +126,34 @@ public class UserRepository extends Application {
         });
     }
 
-    public void newUser(String username, String password, User.Role role, OnUserCreateListener listener) {
+    public void updateUser(User user, OnUserCreateOrUpdateListener listener) {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("id", user.getId());
+            json.put("username", user.getUsername());
+            json.put("password", user.getPassword());
+            json.put("role", user.getRole().toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+            messageLiveData.setValue("Error on JSON creation");
+        }
+
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json.toString());
+
+        api.updateUser(requestBody).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                listener.onUserCreateOrUpdate(response.message(), response.code() == 200);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                listener.onUserCreateOrUpdate("Error creating user", false);
+            }
+        });
+    }
+
+    public void newUser(String username, String password, User.Role role, OnUserCreateOrUpdateListener listener) {
         JSONObject json = new JSONObject();
         try {
             json.put("username", username);
@@ -143,12 +169,12 @@ public class UserRepository extends Application {
         api.newUser(requestBody).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                listener.onUserCreate(response.message(), response.code() == 201);
+                listener.onUserCreateOrUpdate(response.message(), response.code() == 201);
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                listener.onUserCreate("Error creating user", false);
+                listener.onUserCreateOrUpdate("Error updating user", false);
             }
         });
     }

@@ -55,6 +55,44 @@ public class UserManagementController {
         }
     }
 
+    @PUT
+    @Path("/updateUser")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateUser(String jsonPayload) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonPayload);
+
+            if (!jsonObject.has("id")
+                    || !jsonObject.has("username")
+                    || !jsonObject.has("password")
+                    || !jsonObject.has("role")) {
+                return Response.status(400).entity("Username or password missing").build();
+            }
+
+            int id = jsonObject.getInt("id");
+            String username = jsonObject.getString("username");
+            String password = jsonObject.getString("password");
+            String role = jsonObject.getString("role");
+
+            if (UserManagementBusiness.doesUserExist(username)) {
+                return Response.status(400).entity("Username already in use").build();
+            }
+
+            UserManagementBusiness.updateUser(id, username, password, role);
+            return Response.status(200).entity("User updated successfully!").build();
+        } catch (JSONException e) {
+            return Response.status(400).entity("Invalid JSON payload").build();
+        } catch (EmptyParameterException e) {
+            return Response.status(400).entity("There are empty parameters").build();
+        } catch (InvalidRoleException e) {
+            return Response.status(400).entity("Invalid role").build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(500).entity("Internal Server Error").build();
+        }
+    }
+
     @GET
     @Path("/getAdminsInfo")
     @Produces(MediaType.APPLICATION_JSON)

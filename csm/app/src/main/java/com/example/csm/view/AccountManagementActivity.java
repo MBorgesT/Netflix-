@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import com.example.csm.R;
 import com.example.csm.viewmodel.AccountManagementViewModel;
-import com.example.csm.viewmodel.SharedViewModelSource;
+import com.example.csm.util.SharedViewModelSource;
 
 public class AccountManagementActivity extends AppCompatActivity implements UserListAdapter.OnUserDeleteListener{
 
@@ -21,8 +21,6 @@ public class AccountManagementActivity extends AppCompatActivity implements User
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_management);
 
-//        ViewModelProvider viewModelProvider = new ViewModelProvider(this);
-//        viewModel = viewModelProvider.get(AccountManagementViewModel.class);
         viewModel = SharedViewModelSource.getAccountManagementViewModel(this);
 
         setupToast();
@@ -65,6 +63,7 @@ public class AccountManagementActivity extends AppCompatActivity implements User
 
     public void onClickButtonNewUser(View view) {
         Intent newIntent = new Intent(this, UserFormActivity.class);
+        newIntent.putExtra("functionality", UserFormActivity.Functionality.CREATE);
         this.startActivity(newIntent);
     }
 

@@ -1,6 +1,7 @@
 package com.example.csm.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,12 @@ public class UserListAdapter extends ArrayAdapter<User> {
         void onDeleteUser(int userId);
     }
 
+    public interface OnUserUpdateListener {
+        void onUpdateUser(int userId, String username, String password, User.Role role);
+    }
+
     private OnUserDeleteListener deleteListener;
+    private OnUserUpdateListener updateListener;
 
     private Context mContext;
     private List<User> mData;
@@ -53,6 +59,17 @@ public class UserListAdapter extends ArrayAdapter<User> {
             @Override
             public void onClick(View v) {
                 deleteListener.onDeleteUser(mData.get(position).getId());
+            }
+        });
+
+        Button updateButton = convertView.findViewById(R.id.buttonEdit);
+        updateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent newIntent = new Intent(mContext, UserFormActivity.class);
+                newIntent.putExtra("functionality", UserFormActivity.Functionality.UPDATE);
+                newIntent.putExtra("user", mData.get(position));
+                mContext.startActivity(newIntent);
             }
         });
 

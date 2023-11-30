@@ -12,6 +12,7 @@ import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface UserAPI {
@@ -23,6 +24,9 @@ public interface UserAPI {
 
     @POST("userManagement/newUser")
     Call<ResponseBody> newUser(@Body RequestBody body);
+
+    @PUT("userManagement/updateUser")
+    Call<ResponseBody> updateUser(@Body RequestBody body);
 
     @DELETE("userManagement/deleteUser/{userId}")
     Call<ResponseBody> deleteUser(@Path("userId") int userId);

@@ -2,7 +2,9 @@ package com.example.csm.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 
     public enum Role {
         @JsonProperty("SUBSCRIBER")
@@ -15,6 +17,8 @@ public class User {
     int id;
     @JsonProperty("username")
     private String username;
+    @JsonProperty("password")
+    private String password;
     @JsonProperty("role")
     private Role role;
 
@@ -23,6 +27,13 @@ public class User {
     public User(int id, String username, Role role) {
         this.id = id;
         this.username = username;
+        this.role = role;
+    }
+
+    public User(int id, String username, String password, Role role) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
         this.role = role;
     }
 
@@ -40,6 +51,14 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Role getRole() {

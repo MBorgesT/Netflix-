@@ -14,21 +14,21 @@ public class AccountManagementViewModel extends ViewModel {
     private final MutableLiveData<List<User>> adminsLiveData;
     private final MutableLiveData<List<User>> subscribersLiveData;
     private final MutableLiveData<String> messageLiveData;
-    private final MutableLiveData<Boolean> userCreatedLiveData;
+    private final MutableLiveData<Boolean> userFormSuccessLiveData;
     private UserRepository.OnUsersFetchListener onUsersFetchListener;
     private UserRepository.OnUserDeleteListener onUserDeleteListener;
-    private UserRepository.OnUserCreateListener onUserCreateListener;
+    private UserRepository.OnUserCreateOrUpdateListener onUserCreateOrUpdateListener;
 
     public AccountManagementViewModel() {
         userRepository = UserRepository.getInstance();
         adminsLiveData = new MutableLiveData<>();
         subscribersLiveData = new MutableLiveData<>();
         messageLiveData = new MutableLiveData<>();
-        userCreatedLiveData = new MutableLiveData<>();
-        userCreatedLiveData.setValue(false);
+        userFormSuccessLiveData = new MutableLiveData<>();
+        userFormSuccessLiveData.setValue(false);
         createOnUsersFetchListener();
         createOnUserDeleteListener();
-        createOnUserCreateListener();
+        createOnUserCreateOrUpdateListener();
     }
 
     public MutableLiveData<List<User>> getAdminsLiveData() {
@@ -43,8 +43,8 @@ public class AccountManagementViewModel extends ViewModel {
         return messageLiveData;
     }
 
-    public MutableLiveData<Boolean> getUserCreatedLiveData() {
-        return userCreatedLiveData;
+    public MutableLiveData<Boolean> getUserFormSuccessLiveData() {
+        return userFormSuccessLiveData;
     }
 
     public void fetchUsers() {
@@ -53,9 +53,14 @@ public class AccountManagementViewModel extends ViewModel {
     }
 
     public void newUser(String username, String password, User.Role role) {
-        List<User> admins = adminsLiveData.getValue();
-        userCreatedLiveData.setValue(false);
-        userRepository.newUser(username, password, role, onUserCreateListener);
+        userFormSuccessLiveData.setValue(false);
+        userRepository.newUser(username, password, role, onUserCreateOrUpdateListener);
+    }
+
+    public void updateUser(int id, String username, String password, User.Role role) {
+        User toUpdate = new User(id, username, password, role);
+        userFormSuccessLiveData.setValue(false);
+        userRepository.updateUser(toUpdate, onUserCreateOrUpdateListener);
     }
 
     public void deleteUser(int userId) {
@@ -88,14 +93,14 @@ public class AccountManagementViewModel extends ViewModel {
         };
     }
 
-    private void createOnUserCreateListener() {
-        onUserCreateListener = new UserRepository.OnUserCreateListener() {
+    private void createOnUserCreateOrUpdateListener() {
+        onUserCreateOrUpdateListener = new UserRepository.OnUserCreateOrUpdateListener() {
             @Override
-            public void onUserCreate(String message, boolean success) {
+            public void onUserCreateOrUpdate(String message, boolean success) {
                 messageLiveData.setValue(message);
                 if (success) {
                     fetchUsers();
-                    userCreatedLiveData.setValue(true);
+                    userFormSuccessLiveData.setValue(true);
                 }
             }
         };

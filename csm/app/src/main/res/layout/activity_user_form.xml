@@ -48,12 +48,12 @@
     </RadioGroup>
 
     <Button
-        android:id="@+id/buttonNewUser"
-        android:onClick="onClickButtonNewUser"
+        android:id="@+id/buttonConfirmation"
+        android:onClick="onClickButtonConfirmation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="New User" />
+        />
 
     <TextView
         android:id="@+id/textMessage"

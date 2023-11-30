@@ -1,9 +1,11 @@
-package com.example.csm.viewmodel;
+package com.example.csm.util;
 
 import android.content.Context;
 
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
+
+import com.example.csm.viewmodel.AccountManagementViewModel;
 
 public class SharedViewModelSource {
 

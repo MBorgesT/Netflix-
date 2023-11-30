@@ -86,6 +86,33 @@ public class UserManagementBusiness {
         }
     }
 
+    public static void updateUser(int id, String username, String password, String role) throws EmptyParameterException, InvalidRoleException, NoSuchAlgorithmException {
+        if (username.isEmpty() || password.isEmpty() || role.isEmpty()) {
+            throw new EmptyParameterException();
+        }
+        if (!EnumUtils.isValidEnum(User.Role.class, role)) {
+            throw new InvalidRoleException();
+        }
+
+        Session session = HibernateUtil.openSession();
+        Transaction transaction = session.beginTransaction();
+
+        byte[] hashedPassword = AuthUtil.hashPassword(password);
+        User toUpdate = session.get(User.class, id);
+        toUpdate.setUsername(username);
+        toUpdate.setPassword(hashedPassword);
+        toUpdate.setRole(User.Role.valueOf(role));
+        try {
+            session.update(toUpdate);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            throw e;
+        } finally {
+            session.close();
+        }
+    }
+
     public static void deleteUser(int id) {
         Session session = HibernateUtil.openSession();
         Transaction transaction = session.beginTransaction();
