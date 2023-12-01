@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class MediaMetadata {
 
     public enum UploadStatus {
-        RUNNING,
+        PROCESSING,
         FINISHED,
         ERROR,
     }

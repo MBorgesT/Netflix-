@@ -25,8 +25,7 @@ public class ContentManagementController {
     @Path("/uploadMedia")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadMedia(@FormDataParam("json") String jsonPayload,
-                                @FormDataParam("file") InputStream fileInputStream,
-                                  @FormDataParam("file") FormDataContentDisposition fileMetaData) {
+                                @FormDataParam("file") InputStream fileInputStream) {
         try {
             if (jsonPayload == null) {
                 return Response.status(400).entity("Media metadata missing").build();
@@ -42,7 +41,7 @@ public class ContentManagementController {
                 description = jsonObject.getString("description");
             }
 
-            ContentManagementBusiness.uploadMedia(title, description, fileInputStream, fileMetaData);
+            ContentManagementBusiness.uploadMedia(title, description, fileInputStream);
             return Response.ok("Data uploaded successfully!").build();
         } catch (FileAlreadyUploadedException e) {
             return Response.status(205, "File already uploaded.").build();
@@ -52,7 +51,7 @@ public class ContentManagementController {
     }
 
     @GET
-    @Path("/getMediaMetadatas")
+        @Path("/getMediaMetadatas")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAdminsInfo() {
         try {

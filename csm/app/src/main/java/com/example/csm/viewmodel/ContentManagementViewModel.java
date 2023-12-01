@@ -7,21 +7,31 @@ import com.example.csm.model.MediaMetadata;
 import com.example.csm.repository.MediaRepository;
 
 import java.io.File;
+import java.util.List;
 
 public class ContentManagementViewModel extends ViewModel {
 
-    private MediaRepository mediaRepository;
+    private final MediaRepository mediaRepository;
+    private final MutableLiveData<List<MediaMetadata>> mediaMetadataLiveData;
     private final MutableLiveData<String> messageLiveData;
     private final MutableLiveData<Boolean> fileUploadSuccessLiveData;
+    private MediaRepository.OnMediasInfoFetchedListener onMediasInfoFetchedListener;
 
     public ContentManagementViewModel() {
         mediaRepository = MediaRepository.getInstance();
+        mediaMetadataLiveData = new MutableLiveData<>();
         messageLiveData = new MutableLiveData<>();
         fileUploadSuccessLiveData = new MutableLiveData<>();
         fileUploadSuccessLiveData.setValue(false);
+
+        createOnMediasInfoFetchedListener();
     }
 
     // ============================== PUBLIC ==============================
+
+    public void fetchMetadatas() {
+        mediaRepository.fetchMediaInfo(onMediasInfoFetchedListener);
+    }
 
     public void uploadMedia(String title, String description, File file) {
         MediaMetadata toUpload;
@@ -35,6 +45,7 @@ public class ContentManagementViewModel extends ViewModel {
             public void onMediaUploaded(String message) {
                 fileUploadSuccessLiveData.setValue(true);
                 messageLiveData.setValue(message);
+                fetchMetadatas();
             }
 
             @Override
@@ -48,6 +59,23 @@ public class ContentManagementViewModel extends ViewModel {
         return fileUploadSuccessLiveData;
     }
 
+    public MutableLiveData<List<MediaMetadata>> getMediaMetadataLiveData() {
+        return mediaMetadataLiveData;
+    }
+
+    public MutableLiveData<String> getMessageLiveData() {
+        return messageLiveData;
+    }
+
     // ============================== PRIVATE ==============================
+
+    private void createOnMediasInfoFetchedListener() {
+        onMediasInfoFetchedListener = new MediaRepository.OnMediasInfoFetchedListener() {
+            @Override
+            public void onMediasFetched(List<MediaMetadata> metadatas) {
+                mediaMetadataLiveData.setValue(metadatas);
+            }
+        };
+    }
 
 }

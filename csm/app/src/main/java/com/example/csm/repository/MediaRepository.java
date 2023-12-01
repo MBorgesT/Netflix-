@@ -1,6 +1,11 @@
 package com.example.csm.repository;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import com.example.csm.api.MediaAPI;
+import com.example.csm.model.User;
 import com.example.csm.util.ApiBuilder;
 import com.example.csm.model.MediaMetadata;
 
@@ -8,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -23,6 +29,12 @@ public class MediaRepository {
 
         void onMediaUploadFailure(String message);
     }
+
+    public interface OnMediasInfoFetchedListener {
+        void onMediasFetched(List<MediaMetadata> metadatas);
+    }
+
+    private static final String TAG = "MediaRepository";
 
     private static MediaRepository instance;
     private MediaAPI api;
@@ -72,6 +84,20 @@ public class MediaRepository {
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 t.printStackTrace();
                 listener.onMediaUploadFailure("Request failed");
+            }
+        });
+    }
+
+    public void fetchMediaInfo(OnMediasInfoFetchedListener listener) {
+        api.getMediasInfo().enqueue(new Callback<List<MediaMetadata>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<MediaMetadata>> call, @NonNull Response<List<MediaMetadata>> response) {
+                listener.onMediasFetched(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<MediaMetadata>> call, @NonNull Throwable t) {
+                Log.d(TAG, "onFailure: failed to get admins");
             }
         });
     }

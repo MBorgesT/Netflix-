@@ -2,12 +2,10 @@ package com.example.csm.model;
 
 import java.io.Serializable;
 
-import kotlin.jvm.Transient;
-
 public class MediaMetadata implements Serializable {
 
     public enum UploadStatus {
-        RUNNING,
+        PROCESSING,
         FINISHED,
         ERROR,
     }

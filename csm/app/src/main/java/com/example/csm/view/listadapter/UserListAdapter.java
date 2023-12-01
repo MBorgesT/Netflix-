@@ -35,11 +35,12 @@ public class UserListAdapter extends ArrayAdapter<User> {
         this.mData = data;
     }
 
+    // ============================== PUBLIC ==============================
+
     public void setOnUserDeleteListener(OnUserDeleteListener listener) {
         this.deleteListener = listener;
     }
-
-    // TODO: split this into functions
+    
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -51,6 +52,15 @@ public class UserListAdapter extends ArrayAdapter<User> {
         TextView textView = convertView.findViewById(R.id.textFieldUsername);
         textView.setText(mData.get(position).getUsername());
 
+        setupDeleteClickListener(position, convertView);
+        setupUpdateClickListener(position, convertView);
+
+        return convertView;
+    }
+
+    // ============================== PRIVATE ==============================
+
+    private void setupDeleteClickListener(int position, View convertView) {
         Button deleteButton = convertView.findViewById(R.id.buttonDelete);
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,7 +68,9 @@ public class UserListAdapter extends ArrayAdapter<User> {
                 deleteListener.onDeleteUser(mData.get(position).getId());
             }
         });
+    }
 
+    private void setupUpdateClickListener(int position, View convertView) {
         Button updateButton = convertView.findViewById(R.id.buttonEdit);
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,7 +81,6 @@ public class UserListAdapter extends ArrayAdapter<User> {
                 mContext.startActivity(newIntent);
             }
         });
-
-        return convertView;
     }
+
 }

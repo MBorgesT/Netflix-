@@ -51,7 +51,7 @@ public final class HLSPackager {
         if (!processes.containsKey(fileName)) {
             return false;
         }
-        return (checkProcessStatus(fileName) == MediaMetadata.UploadStatus.RUNNING);
+        return (checkProcessStatus(fileName) == MediaMetadata.UploadStatus.PROCESSING);
     }
 
     public HashMap<String, MediaMetadata.UploadStatus> getUploadStatuses() throws IOException {
@@ -95,7 +95,7 @@ public final class HLSPackager {
                 return MediaMetadata.UploadStatus.ERROR;
             }
         } catch (IllegalThreadStateException e) {
-            return MediaMetadata.UploadStatus.RUNNING;
+            return MediaMetadata.UploadStatus.PROCESSING;
         }
     }
 

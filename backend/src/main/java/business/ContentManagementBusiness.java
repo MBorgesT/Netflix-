@@ -1,7 +1,6 @@
 package business;
 
 import model.MediaMetadata;
-import model.User;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -10,12 +9,11 @@ import utils.HLSPackager;
 import utils.HibernateUtil;
 import utils.LocalPaths;
 
-import javax.print.attribute.standard.Media;
 import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.text.Normalizer;
 import java.util.List;
 import java.util.Map;
 
@@ -27,12 +25,9 @@ public class ContentManagementBusiness {
 
     public static void uploadMedia(
             String title, String description,
-            InputStream fileInputStream,
-            FormDataContentDisposition fileMetaData
+            InputStream fileInputStream
     ) throws Exception {
-        String[] fileInfo = getFileInfo(fileMetaData);
-        String folderName = fileInfo[0];
-        String fileExtension = fileInfo[1];
+        String folderName = getFolderName(title);
 
         HLSPackager packager = HLSPackager.getInstance();
         if (packager.isVideoAlreadyBeingPackaged(folderName)) {
@@ -43,7 +38,7 @@ public class ContentManagementBusiness {
         }
 
         try {
-            saveFile(fileInputStream, folderName, fileExtension);
+            saveFile(fileInputStream, folderName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -64,15 +59,17 @@ public class ContentManagementBusiness {
             folderName = mm.getFolderName();
             if (statuses.containsKey(folderName)) {
                 mm.setUploadStatus(statuses.get(folderName));
+            } else {
+                if (checkIfProcessingFinished(folderName)) {
+                    mm.setUploadStatus(MediaMetadata.UploadStatus.FINISHED);
+                } else {
+                    mm.setUploadStatus(MediaMetadata.UploadStatus.ERROR);
+                }
             }
         }
 
         return mediaMetadatas;
     }
-
-//    public static HashMap<String, Media> getUploadStatuses() throws IOException {
-//        return HLSPackager.getInstance().getUploadStatuses();
-//    }
 
     // -----------------------------------------------------------------
     // ------------------------ PRIVATE METHODS ------------------------
@@ -99,29 +96,25 @@ public class ContentManagementBusiness {
         }
     }
 
-    private static String[] getFileInfo(FormDataContentDisposition fileMetaData) {
-        String folderName = fileMetaData.getFileName();
-        String fileExtension = "";
-        if (folderName.contains(".")) {
-            String reversed = String.valueOf(new StringBuilder(folderName).reverse());
-            fileExtension = reversed.split("\\.")[0];
-            fileExtension = "." + String.valueOf(new StringBuilder(fileExtension).reverse());
+    private static String getFolderName(String title) {
+        // Remove accents and replaces spaces with underscores
+        String normalizedString = Normalizer.normalize(title, Normalizer.Form.NFD)
+                .replaceAll("[^\\p{ASCII}]", "")
+                .replaceAll(" ", "_");
 
-            folderName = String.valueOf(new StringBuilder(reversed.split("\\.")[1]).reverse());
-        }
-
-        return new String[]{folderName, fileExtension};
+        // Keep only alphanumeric characters
+        return normalizedString.replaceAll("[^a-zA-Z0-9]", "");
     }
 
     private static void saveFile(InputStream fileInputStream,
-                                 String fileName, String fileExtension) throws IOException {
-        String UPLOAD_PATH = LocalPaths.MEDIA_FOLDER + fileName + "/";
+                                 String folderName) throws IOException {
+        String UPLOAD_PATH = LocalPaths.MEDIA_FOLDER + folderName + "/";
         try {
             byte[] bytes = new byte[1024];
 
             Files.createDirectory(Path.of(UPLOAD_PATH));
 
-            OutputStream out = new FileOutputStream(UPLOAD_PATH + "original" + fileExtension);
+            OutputStream out = new FileOutputStream(UPLOAD_PATH + "original");
             int read = 0;
             while ((read = fileInputStream.read(bytes)) != -1) {
                 out.write(bytes, 0, read);
@@ -131,6 +124,12 @@ public class ContentManagementBusiness {
         } catch (IOException e) {
             throw e;
         }
+    }
+
+    private static boolean checkIfProcessingFinished(String folderName) {
+        String filePath = LocalPaths.MEDIA_FOLDER + folderName + "/flag.txt" ;
+        File file = new File(filePath);
+        return file.exists();
     }
 
 }

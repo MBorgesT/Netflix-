@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 
 public class MediaFormActivity extends AppCompatActivity {
 
@@ -67,17 +68,19 @@ public class MediaFormActivity extends AppCompatActivity {
 
     private File createFileFromUri(Uri uri) {
         File file = new File(getCacheDir(), "video.mp4");
-        try (InputStream inputStream = getContentResolver().openInputStream(uri);
-             OutputStream outputStream = new FileOutputStream(file)) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            try (InputStream inputStream = getContentResolver().openInputStream(uri);
+                 OutputStream outputStream = Files.newOutputStream(file.toPath())) {
 
-            byte[] buffer = new byte[4 * 1024]; // Adjust buffer size as needed
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
+                byte[] buffer = new byte[16 * 1024]; // Increased buffer size
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+                return file;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            return file;
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return null;
     }
