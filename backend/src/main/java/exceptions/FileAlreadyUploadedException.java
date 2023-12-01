@@ -1,4 +1,4 @@
-package projectExceptions;
+package exceptions;
 
 public class FileAlreadyUploadedException extends Exception {
 

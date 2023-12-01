@@ -43,6 +43,7 @@ public class UserRepository extends Application {
     private final UserAPI api;
 
     // LOGIN
+    // TODO: make this work in the MVVM way
     private MutableLiveData<String> messageLiveData;
     private static MutableLiveData<Boolean> userAuthenticatedLiveData;
 

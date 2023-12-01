@@ -9,6 +9,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.csm.R;
+import com.example.csm.view.listadapter.UserListAdapter;
 import com.example.csm.viewmodel.AccountManagementViewModel;
 import com.example.csm.util.SharedViewModelSource;
 

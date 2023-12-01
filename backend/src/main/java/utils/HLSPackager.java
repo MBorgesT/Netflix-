@@ -1,5 +1,6 @@
 package utils;
 
+import model.MediaMetadata;
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedReader;
@@ -12,12 +13,6 @@ import java.util.HashMap;
 import java.util.stream.Collectors;
 
 public final class HLSPackager {
-
-    enum ProcessStatus {
-        RUNNING,
-        FINISHED,
-        ERROR,
-    }
 
     private static HLSPackager instance;
     private final HashMap<String, Process> processes;
@@ -56,26 +51,24 @@ public final class HLSPackager {
         if (!processes.containsKey(fileName)) {
             return false;
         }
-        return (checkProcessStatus(fileName) == ProcessStatus.RUNNING);
+        return (checkProcessStatus(fileName) == MediaMetadata.UploadStatus.RUNNING);
     }
 
-    public HashMap<String, String> getUploadStatuses() throws IOException {
+    public HashMap<String, MediaMetadata.UploadStatus> getUploadStatuses() throws IOException {
         //cleanProcesses();
 
-        HashMap<String, String> statuses = new HashMap<>();
-        ProcessStatus status;
-        String statusText;
+        HashMap<String, MediaMetadata.UploadStatus> statuses = new HashMap<>();
+        MediaMetadata.UploadStatus status;
         for (String processName: processes.keySet()) {
             status = checkProcessStatus(processName);
-            statusText = status.name();
 
-            if (status == ProcessStatus.ERROR) {
+            if (status == MediaMetadata.UploadStatus.ERROR) {
                 //statusText += " - " + getProcessError(processName);
                 System.out.println("\n==============================\n");
                 System.out.println(getProcessError(processName));
             }
 
-            statuses.put(processName, statusText);
+            statuses.put(processName, status);
         }
         return statuses;
     }
@@ -86,23 +79,23 @@ public final class HLSPackager {
 
     private void cleanProcesses() {
         for (String processName: processes.keySet()) {
-            if (checkProcessStatus(processName) == ProcessStatus.FINISHED) {
+            if (checkProcessStatus(processName) == MediaMetadata.UploadStatus.FINISHED) {
                 processes.remove(processName);
             }
         }
     }
 
-    private ProcessStatus checkProcessStatus(String processName) {
+    private MediaMetadata.UploadStatus checkProcessStatus(String processName) {
         Process p = processes.get(processName);
         try {
             int exitValue = p.exitValue();
             if (exitValue == 0) {
-                return ProcessStatus.FINISHED;
+                return MediaMetadata.UploadStatus.FINISHED;
             } else {
-                return ProcessStatus.ERROR;
+                return MediaMetadata.UploadStatus.ERROR;
             }
         } catch (IllegalThreadStateException e) {
-            return ProcessStatus.RUNNING;
+            return MediaMetadata.UploadStatus.RUNNING;
         }
     }
 

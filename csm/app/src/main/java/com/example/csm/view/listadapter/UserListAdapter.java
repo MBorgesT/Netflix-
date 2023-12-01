@@ -1,4 +1,4 @@
-package com.example.csm.view;
+package com.example.csm.view.listadapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 
 import com.example.csm.R;
 import com.example.csm.model.User;
+import com.example.csm.view.UserFormActivity;
 
 import java.util.List;
 
@@ -23,12 +24,7 @@ public class UserListAdapter extends ArrayAdapter<User> {
         void onDeleteUser(int userId);
     }
 
-    public interface OnUserUpdateListener {
-        void onUpdateUser(int userId, String username, String password, User.Role role);
-    }
-
     private OnUserDeleteListener deleteListener;
-    private OnUserUpdateListener updateListener;
 
     private Context mContext;
     private List<User> mData;
@@ -43,6 +39,7 @@ public class UserListAdapter extends ArrayAdapter<User> {
         this.deleteListener = listener;
     }
 
+    // TODO: split this into functions
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {

@@ -20,4 +20,9 @@ public class MainMenuActivity extends AppCompatActivity {
         Intent newIntent = new Intent(this, AccountManagementActivity.class);
         this.startActivity(newIntent);
     }
+
+    public void onClickButtonContentManagement(View view) {
+        Intent newIntent = new Intent(this, ContentManagementActivity.class);
+        this.startActivity(newIntent);
+    }
 }
