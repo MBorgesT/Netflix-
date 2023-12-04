@@ -30,7 +30,7 @@
         android:id="@+id/buttonSelectFile"
         android:onClick="onClickButtonSelectFile"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="64dp"
         android:text="Select File"
         />
 

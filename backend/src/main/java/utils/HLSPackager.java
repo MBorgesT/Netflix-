@@ -37,7 +37,10 @@ public final class HLSPackager {
 
         String mediaPath = LocalPaths.MEDIA_FOLDER + processName + "/";
 
-        String[] commandList = new String[]{"/bin/bash", "-c", LocalPaths.PACKAGING_SCRIPT};
+        String[] commandList = new String[]{
+                "/bin/bash", "-c", LocalPaths.PACKAGING_SCRIPT, " \n",
+                "/bin/bash", "-c", LocalPaths.FLAG_SCRIPT
+        };
         ProcessBuilder processBuilder = new ProcessBuilder(commandList);
         processBuilder.directory(new File(mediaPath));
         Process p = processBuilder.start();

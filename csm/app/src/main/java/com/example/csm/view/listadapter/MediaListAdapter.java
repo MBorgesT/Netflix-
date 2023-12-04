@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 
 import com.example.csm.R;
 import com.example.csm.model.MediaMetadata;
+import com.example.csm.view.MediaFormActivity;
 import com.example.csm.view.UserFormActivity;
 
 import java.util.List;
@@ -90,9 +91,9 @@ public class MediaListAdapter extends ArrayAdapter<MediaMetadata> {
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent newIntent = new Intent(mContext, UserFormActivity.class);
-                newIntent.putExtra("functionality", UserFormActivity.Functionality.UPDATE);
-                newIntent.putExtra("user", mData.get(position));
+                Intent newIntent = new Intent(mContext, MediaFormActivity.class);
+                newIntent.putExtra("functionality", MediaFormActivity.Functionality.UPDATE);
+                newIntent.putExtra("mediaMetadata", mData.get(position));
                 mContext.startActivity(newIntent);
             }
         });

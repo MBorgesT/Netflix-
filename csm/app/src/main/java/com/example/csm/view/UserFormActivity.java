@@ -38,6 +38,8 @@ public class UserFormActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_form);
 
         viewModel = SharedViewModelSource.getAccountManagementViewModel(this);
+        viewModel.getUserFormSuccessLiveData().setValue(false);
+
 
         usernameTextView = findViewById(R.id.editTextUsername);
         passwordEditText = findViewById(R.id.editTextPassword);

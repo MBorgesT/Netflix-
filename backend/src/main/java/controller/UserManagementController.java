@@ -75,7 +75,7 @@ public class UserManagementController {
             String password = jsonObject.getString("password");
             String role = jsonObject.getString("role");
 
-            if (UserManagementBusiness.doesUserExist(username)) {
+            if (UserManagementBusiness.doesUserExistAtAnotherId(username, id)) {
                 return Response.status(400).entity("Username already in use").build();
             }
 

@@ -33,6 +33,7 @@ public class ContentManagementActivity extends AppCompatActivity implements Medi
 
     public void onClickButtonUploadMedia(View view) {
         Intent newIntent = new Intent(this, MediaFormActivity.class);
+        newIntent.putExtra("functionality", MediaFormActivity.Functionality.CREATE);
         this.startActivity(newIntent);
     }
 
@@ -60,8 +61,8 @@ public class ContentManagementActivity extends AppCompatActivity implements Medi
     }
 
     @Override
-    public void onDeleteMedia(int mediaId) {
-        System.out.println(mediaId + " deleted!!!!!");
+    public void onDeleteMedia(int mediaId){
+        viewModel.deleteMedia(mediaId);
     }
 
     // ============================== PRIVATE ==============================

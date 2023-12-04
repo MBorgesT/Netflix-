@@ -5,7 +5,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.csm.api.MediaAPI;
-import com.example.csm.model.User;
 import com.example.csm.util.ApiBuilder;
 import com.example.csm.model.MediaMetadata;
 
@@ -24,10 +23,14 @@ import retrofit2.Response;
 
 public class MediaRepository {
 
-    public interface OnMediaUploadedListener {
-        void onMediaUploaded(String message);
+    public interface OnMediaUploadOrUpdateListener {
+        void onMediaUploadOrUpdate(String message);
 
-        void onMediaUploadFailure(String message);
+        void onMediaUploadOrUpdateFailure(String message);
+    }
+
+    public interface OnMediaDeleteListener {
+        void onMediaDelete(String message, boolean success);
     }
 
     public interface OnMediasInfoFetchedListener {
@@ -52,7 +55,7 @@ public class MediaRepository {
 
     // ============================== PUBLIC ==============================
 
-    public void uploadMedia(MediaMetadata toUpload, File file, OnMediaUploadedListener listener) {
+    public void uploadMedia(MediaMetadata toUpload, File file, OnMediaUploadOrUpdateListener listener) {
         JSONObject json = new JSONObject();
         try {
             json.put("title", toUpload.getTitle());
@@ -63,7 +66,7 @@ public class MediaRepository {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            listener.onMediaUploadFailure("Failure on building JSON");
+            listener.onMediaUploadOrUpdateFailure("Failure on building JSON");
             return;
         }
 
@@ -74,16 +77,64 @@ public class MediaRepository {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
-                    listener.onMediaUploaded(response.message());
+                    listener.onMediaUploadOrUpdate(response.message());
                 } else {
-                    listener.onMediaUploadFailure(response.message());
+                    listener.onMediaUploadOrUpdateFailure(response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 t.printStackTrace();
-                listener.onMediaUploadFailure("Request failed");
+                listener.onMediaUploadOrUpdateFailure("Request failed");
+            }
+        });
+    }
+
+    public void updateMedia(MediaMetadata toUpdate, OnMediaUploadOrUpdateListener listener) {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("id", toUpdate.getId());
+            json.put("title", toUpdate.getTitle());
+            String description = toUpdate.getDescription();
+            if (description != null) {
+                json.put("description", description);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            listener.onMediaUploadOrUpdateFailure("Failure on building JSON");
+            return;
+        }
+
+        RequestBody jsonRequestBody = RequestBody.create(MediaType.parse("application/json"), json.toString());
+        api.updateMedia(jsonRequestBody).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    listener.onMediaUploadOrUpdate(response.message());
+                } else {
+                    listener.onMediaUploadOrUpdateFailure(response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                t.printStackTrace();
+                listener.onMediaUploadOrUpdateFailure("Request failed");
+            }
+        });
+    }
+
+    public void deleteMedia(int mediaId, OnMediaDeleteListener listener) {
+        api.deleteMedia(mediaId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                listener.onMediaDelete(response.message(), response.code() == 200);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                listener.onMediaDelete("Error deleting media", false);
             }
         });
     }

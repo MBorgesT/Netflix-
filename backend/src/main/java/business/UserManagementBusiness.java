@@ -29,8 +29,19 @@ public class UserManagementBusiness {
 
     public static boolean doesUserExist(String username) {
         Session session = HibernateUtil.openSession();
-        Query query = session.createQuery("from User where username =:username ")
+        Query query = session.createQuery("from User where username =:username")
                 .setParameter("username", username);
+        User exists = (User) query.uniqueResult();
+        session.close();
+        return exists != null;
+    }
+
+    public static boolean doesUserExistAtAnotherId(String username, int id) {
+        Session session = HibernateUtil.openSession();
+        Query query = session.createQuery("from User where username =:username " +
+                        "and id !=:id")
+                .setParameter("username", username)
+                .setParameter("id", id);
         User exists = (User) query.uniqueResult();
         session.close();
         return exists != null;

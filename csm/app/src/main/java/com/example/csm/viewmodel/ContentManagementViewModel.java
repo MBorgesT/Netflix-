@@ -16,6 +16,8 @@ public class ContentManagementViewModel extends ViewModel {
     private final MutableLiveData<String> messageLiveData;
     private final MutableLiveData<Boolean> fileUploadSuccessLiveData;
     private MediaRepository.OnMediasInfoFetchedListener onMediasInfoFetchedListener;
+    private MediaRepository.OnMediaUploadOrUpdateListener onMediaUploadOrUpdateListener;
+    private MediaRepository.OnMediaDeleteListener onMediaDeleteListener;
 
     public ContentManagementViewModel() {
         mediaRepository = MediaRepository.getInstance();
@@ -25,6 +27,8 @@ public class ContentManagementViewModel extends ViewModel {
         fileUploadSuccessLiveData.setValue(false);
 
         createOnMediasInfoFetchedListener();
+        createOnMediaUploadOrUpdateListener();
+        createOnMediaDeleteListener();
     }
 
     // ============================== PUBLIC ==============================
@@ -40,19 +44,22 @@ public class ContentManagementViewModel extends ViewModel {
         } else {
             toUpload = new MediaMetadata(title, description);
         }
-        mediaRepository.uploadMedia(toUpload, file, new MediaRepository.OnMediaUploadedListener() {
-            @Override
-            public void onMediaUploaded(String message) {
-                fileUploadSuccessLiveData.setValue(true);
-                messageLiveData.setValue(message);
-                fetchMetadatas();
-            }
+        mediaRepository.uploadMedia(toUpload, file, onMediaUploadOrUpdateListener);
+    }
 
-            @Override
-            public void onMediaUploadFailure(String message) {
-                messageLiveData.setValue(message);
-            }
-        });
+    public void updateMedia(int mediaId, String title, String description) {
+        MediaMetadata toUpdate;
+        if (description == null) {
+            toUpdate = new MediaMetadata(mediaId, title);
+        } else {
+            toUpdate = new MediaMetadata(mediaId, title, description);
+        }
+        mediaRepository.updateMedia(toUpdate, onMediaUploadOrUpdateListener);
+    }
+
+
+    public void deleteMedia(int mediaId) {
+        mediaRepository.deleteMedia(mediaId, onMediaDeleteListener);
     }
 
     public MutableLiveData<Boolean> getFileUploadSuccessLiveData() {
@@ -69,11 +76,39 @@ public class ContentManagementViewModel extends ViewModel {
 
     // ============================== PRIVATE ==============================
 
+    private void createOnMediaUploadOrUpdateListener() {
+        onMediaUploadOrUpdateListener = new MediaRepository.OnMediaUploadOrUpdateListener() {
+            @Override
+            public void onMediaUploadOrUpdate(String message) {
+                fileUploadSuccessLiveData.setValue(true);
+                messageLiveData.setValue(message);
+                fetchMetadatas();
+            }
+
+            @Override
+            public void onMediaUploadOrUpdateFailure(String message) {
+                messageLiveData.setValue(message);
+            }
+        };
+    }
+
     private void createOnMediasInfoFetchedListener() {
         onMediasInfoFetchedListener = new MediaRepository.OnMediasInfoFetchedListener() {
             @Override
             public void onMediasFetched(List<MediaMetadata> metadatas) {
                 mediaMetadataLiveData.setValue(metadatas);
+            }
+        };
+    }
+
+    private void createOnMediaDeleteListener() {
+        onMediaDeleteListener = new MediaRepository.OnMediaDeleteListener() {
+            @Override
+            public void onMediaDelete(String message, boolean success) {
+                messageLiveData.setValue(message);
+                if (success) {
+                    fetchMetadatas();
+                }
             }
         };
     }

@@ -19,6 +19,17 @@ public class MediaMetadata implements Serializable {
 
     }
 
+    public MediaMetadata(int id, String title) {
+        this.id = id;
+        this.title = title;
+    }
+
+    public MediaMetadata(int id, String title, String description) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+    }
+
     public MediaMetadata(String title, UploadStatus uploadStatus) {
         this.title = title;
         this.uploadStatus = uploadStatus;
