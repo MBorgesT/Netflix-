@@ -37,20 +37,17 @@ public class UserRepository extends Application {
         void onUserDelete(String message, boolean success);
     }
 
+    public interface OnUserAuthenticateListener {
+        void onUserAuthenticate(String message, boolean success);
+    }
+
     private static final String TAG = "UserRepository";
 
     private static UserRepository instance;
     private final UserAPI api;
 
-    // LOGIN
-    // TODO: make this work in the MVVM way
-    private MutableLiveData<String> messageLiveData;
-    private static MutableLiveData<Boolean> userAuthenticatedLiveData;
-
     private UserRepository() {
         api = ApiBuilder.create(UserAPI.class);
-        messageLiveData = new MutableLiveData<>();
-        userAuthenticatedLiveData = new MutableLiveData<>();
     };
 
     public static UserRepository getInstance() {
@@ -60,43 +57,29 @@ public class UserRepository extends Application {
         return instance;
     }
 
-    public MutableLiveData<String> getMessageLiveData() {
-        return messageLiveData;
-    }
-
-    public MutableLiveData<Boolean> getUserAuthenticatedLiveData() {
-        return userAuthenticatedLiveData;
-    }
-
-    public MutableLiveData<Boolean> adminLogin(String username, String password) {
+    public void adminLogin(String username, String password, OnUserAuthenticateListener listener) {
         JSONObject json = new JSONObject();
         try {
             json.put("username", username);
             json.put("password", password);
         } catch (JSONException e) {
             e.printStackTrace();
-            messageLiveData.setValue("Error on authentication");
-            userAuthenticatedLiveData.setValue(false);
-            return userAuthenticatedLiveData;
+            listener.onUserAuthenticate("Error on authentication", false);
         }
 
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json.toString());
         api.adminLogin(requestBody).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                messageLiveData.setValue(response.message());
-                userAuthenticatedLiveData.setValue(response.code() == 200);
+                listener.onUserAuthenticate(response.message(), response.code() == 200);
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 t.printStackTrace();
-                messageLiveData.setValue("Error on connecting to server");
-                userAuthenticatedLiveData.setValue(false);
+                listener.onUserAuthenticate("Error on connecting to server", false);
             }
         });
-
-        return userAuthenticatedLiveData;
     }
 
     public void fetchAdminsInfo(OnUsersFetchListener listener) {
@@ -136,7 +119,7 @@ public class UserRepository extends Application {
             json.put("role", user.getRole().toString());
         } catch (JSONException e) {
             e.printStackTrace();
-            messageLiveData.setValue("Error on JSON creation");
+            listener.onUserCreateOrUpdate("Error on JSON creation", false);
         }
 
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json.toString());
@@ -162,7 +145,7 @@ public class UserRepository extends Application {
             json.put("role", user.getRole().toString());
         } catch (JSONException e) {
             e.printStackTrace();
-            messageLiveData.setValue("Error on JSON creation");
+            listener.onUserCreateOrUpdate("Error on JSON creation", false);
         }
 
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json.toString());
