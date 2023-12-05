@@ -5,6 +5,7 @@
     android:screenOrientation="landscape"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     tools:context=".view.VideoPlayerActivity">
 
     <androidx.media3.ui.PlayerView

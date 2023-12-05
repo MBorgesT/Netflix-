@@ -3,7 +3,17 @@ package com.example.client.view;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.MimeTypes;
+import androidx.media3.common.util.UnstableApi;
+import androidx.media3.common.util.Util;
+import androidx.media3.datasource.DefaultDataSourceFactory;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.hls.HlsMediaSource;
+import androidx.media3.exoplayer.source.MediaSource;
+import androidx.media3.exoplayer.trackselection.AdaptiveTrackSelection;
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
+import androidx.media3.exoplayer.trackselection.MappingTrackSelector;
+import androidx.media3.exoplayer.trackselection.TrackSelector;
 import androidx.media3.ui.PlayerView;
 
 import android.content.pm.ActivityInfo;
@@ -17,7 +27,7 @@ import com.example.client.util.Resources;
 import com.example.client.viewmodel.MainMenuViewModel;
 import com.example.client.viewmodel.VideoPlayerViewModel;
 
-public class VideoPlayerActivity extends AppCompatActivity {
+@UnstableApi public class VideoPlayerActivity extends AppCompatActivity {
 
     private VideoPlayerViewModel viewModel;
 
@@ -37,15 +47,23 @@ public class VideoPlayerActivity extends AppCompatActivity {
 
         mediaId = getIntent().getIntExtra("mediaId", 0);
 
-        player = new ExoPlayer.Builder(this).build();
-        playerView = findViewById(R.id.playerView);
-        playerView.setPlayer(player);
-
+        setupVideoPlayer();
         setupToast();
         setupMediaFetchObserver();
         fetchMediaInfo();
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    }
+
+    private void setupVideoPlayer() {
+        TrackSelector trackSelector = new DefaultTrackSelector(this);
+
+        player = new ExoPlayer.Builder(this)
+                .setTrackSelector(trackSelector)
+                .build();
+
+        playerView = findViewById(R.id.playerView);
+        playerView.setPlayer(player);
     }
 
     private void setupToast() {
@@ -73,7 +91,18 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 Resources.backendResourcesUrl
                         + mediaMetadata.getFolderName()
                         + "/master.m3u8");
-        player.setMediaItem(MediaItem.fromUri(uri));
+
+        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this,
+                Util.getUserAgent(this, "YourApp"));
+        MediaSource mediaSource = new HlsMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(MediaItem.fromUri(uri));
+        player.setMediaSource(mediaSource);
+
+//        MediaItem mediaItem = new MediaItem.Builder()
+//                        .setUri(uri)
+//                        .setMimeType(MimeTypes.APPLICATION_M3U8)
+//                        .build();
+//        player.setMediaItem(mediaItem);
 
         player.prepare();
         player.play();

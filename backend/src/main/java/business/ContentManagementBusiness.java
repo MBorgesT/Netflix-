@@ -179,9 +179,6 @@ public class ContentManagementBusiness {
         if (directory.exists()) {
             deleteFolder(directory);
         }
-//        } else {
-//            throw new FolderDoesNotExistException("Folder does not exist");
-//        }
     }
 
     private static void deleteFolder(File folder) {
