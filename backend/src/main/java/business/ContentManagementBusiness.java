@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,15 @@ public class ContentManagementBusiness {
     // ----------------------------------------------------------------
     // ------------------------ PUBLIC METHODS ------------------------
     // ----------------------------------------------------------------
+
+    public static MediaMetadata getMediaById(int mediaId) {
+        Session session = HibernateUtil.openSession();
+        Query query = session.createQuery("from MediaMetadata where id =:id")
+                .setParameter("id", mediaId);
+        MediaMetadata media = (MediaMetadata) query.uniqueResult();
+        session.close();
+        return media;
+    }
 
     public static boolean doesTitleExist(String title) {
         Session session = HibernateUtil.openSession();
@@ -96,6 +106,16 @@ public class ContentManagementBusiness {
         }
 
         return mediaMetadatas;
+    }
+
+    public static List<MediaMetadata> getMediasReadyToPlay() throws IOException {
+        List<MediaMetadata> readyMedias = new ArrayList<>();
+        for (MediaMetadata mm: getMediaMetadataList()) {
+            if (mm.getUploadStatus() == MediaMetadata.UploadStatus.FINISHED) {
+                readyMedias.add(mm);
+            }
+        }
+        return readyMedias;
     }
 
     // TODO: create this kind of methods in abstract

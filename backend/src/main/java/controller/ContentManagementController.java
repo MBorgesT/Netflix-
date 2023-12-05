@@ -91,9 +91,24 @@ public class ContentManagementController {
     }
 
     @GET
-        @Path("/getMediaMetadatas")
+    @Path("/getMediaMetadatas")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAdminsInfo() {
+    public Response getMediaMetadatas() {
+        try {
+            List<MediaMetadata> metadatas = ContentManagementBusiness.getMediasReadyToPlay();
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(metadatas);
+
+            return Response.status(Response.Status.OK).entity(json).build();
+        } catch (IOException e) {
+            return Response.status(500).build();
+        }
+    }
+
+    @GET
+    @Path("/getMediasReadyToPlay")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMediasReadyToPlay() {
         try {
             List<MediaMetadata> metadatas = ContentManagementBusiness.getMediaMetadataList();
             ObjectMapper mapper = new ObjectMapper();
@@ -105,13 +120,31 @@ public class ContentManagementController {
         }
     }
 
+    @GET
+    @Path("getMediaById/{mediaId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMediaInfo(@PathParam("mediaId") int mediaId) {
+        try {
+            MediaMetadata media = ContentManagementBusiness.getMediaById(mediaId);
+            if (media == null) {
+                return Response.status(400).entity("Media with the specified id does not exist").build();
+            }
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(media);
+            return Response.ok().entity(json).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(500).entity("Internal Server Error").build();
+        }
+    }
+
     @DELETE
     @Path("/deleteMedia/{mediaId}")
     //@Produces(MediaType.APPLICATION_JSON)
     public Response deleteUser(@PathParam("mediaId") int mediaId) {
         try {
             if (!ContentManagementBusiness.doesMediaExist(mediaId)) {
-                return Response.status(400).entity("User with the specified id does not exist").build();
+                return Response.status(400).entity("Media with the specified id does not exist").build();
             }
 
             ContentManagementBusiness.deleteMedia(mediaId);

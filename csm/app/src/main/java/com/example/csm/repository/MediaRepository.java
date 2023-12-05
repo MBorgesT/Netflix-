@@ -148,6 +148,7 @@ public class MediaRepository {
 
             @Override
             public void onFailure(@NonNull Call<List<MediaMetadata>> call, @NonNull Throwable t) {
+                // TODO: make this do a toast
                 Log.d(TAG, "onFailure: failed to get admins");
             }
         });
