@@ -2,15 +2,10 @@ package business;
 
 import exceptions.EmptyParameterException;
 import exceptions.FolderDoesNotExistException;
-import exceptions.InvalidRoleException;
 import model.MediaMetadata;
-import model.User;
-import org.apache.commons.lang3.EnumUtils;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
-import utils.AuthUtil;
 import utils.HLSPackager;
 import utils.HibernateUtil;
 import utils.LocalPaths;
@@ -19,7 +14,6 @@ import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,13 +58,15 @@ public class ContentManagementBusiness {
             String title, String description,
             InputStream fileInputStream
     ) throws Exception {
+        // TODO: check if there is no other folder with same name
         String folderName = getFolderName(title);
 
         HLSPackager packager = HLSPackager.getInstance();
         if (packager.isVideoAlreadyBeingPackaged(folderName)) {
             throw new FileAlreadyExistsException(title + " is already being uploaded.");
         }
-        if (Files.exists(Path.of(LocalPaths.MEDIA_FOLDER + folderName + "/"))) {
+        String folderPath = LocalPaths.MEDIA_FOLDER + folderName + "/";
+        if (Files.exists(Path.of(folderPath))) {
             throw new FileAlreadyExistsException(folderName + " already exists");
         }
 
@@ -79,8 +75,36 @@ public class ContentManagementBusiness {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        saveMediaMetadata(title, description, folderName);
-        packager.packageVideo(folderName);
+
+        MediaMetadata metadata = saveMediaMetadata(title, description, folderName);
+        packager.packageVideo(folderName, new HLSPackager.OnVideoProcessedListener() {
+            @Override
+            public void onVideoProcessed() {
+                Session session = HibernateUtil.openSession();
+                Transaction transaction = session.beginTransaction();
+                try {
+                    HLSPackager packager = HLSPackager.getInstance();
+                    packager.hashChunks(folderPath, metadata.getId(), session);
+                    packager.createFinishedFlag(folderPath);
+
+                    metadata.setUploadStatus(MediaMetadata.UploadStatus.FINISHED);
+                    session.update(metadata);
+
+                    transaction.commit();
+                } catch (Exception e) {
+                    transaction.rollback();
+                    deleteMediaFolder(folderName);
+
+                    Transaction errorTransaction = session.beginTransaction();
+                    metadata.setUploadStatus(MediaMetadata.UploadStatus.ERROR);
+                    session.update(metadata);
+                    errorTransaction.commit();
+
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     public static List<MediaMetadata> getMediaMetadataList() throws IOException {
@@ -90,27 +114,14 @@ public class ContentManagementBusiness {
         List<MediaMetadata> mediaMetadatas = query.list();
         session.close();
 
-        Map<String, MediaMetadata.UploadStatus> statuses = HLSPackager.getInstance().getUploadStatuses();
-        String folderName;
-        for (MediaMetadata mm : mediaMetadatas) {
-            folderName = mm.getFolderName();
-            if (statuses.containsKey(folderName)) {
-                mm.setUploadStatus(statuses.get(folderName));
-            } else {
-                if (checkIfProcessingFinished(folderName)) {
-                    mm.setUploadStatus(MediaMetadata.UploadStatus.FINISHED);
-                } else {
-                    mm.setUploadStatus(MediaMetadata.UploadStatus.ERROR);
-                }
-            }
-        }
+        //mediaMetadatas = setMediaStatuses(mediaMetadatas);
 
         return mediaMetadatas;
     }
 
     public static List<MediaMetadata> getMediasReadyToPlay() throws IOException {
         List<MediaMetadata> readyMedias = new ArrayList<>();
-        for (MediaMetadata mm: getMediaMetadataList()) {
+        for (MediaMetadata mm : getMediaMetadataList()) {
             if (mm.getUploadStatus() == MediaMetadata.UploadStatus.FINISHED) {
                 readyMedias.add(mm);
             }
@@ -151,6 +162,7 @@ public class ContentManagementBusiness {
     }
 
     public static void deleteMedia(int mediaId) {
+        // TODO: delete chunk hashes too
         Session session = HibernateUtil.openSession();
         Transaction transaction = session.beginTransaction();
 
@@ -172,21 +184,40 @@ public class ContentManagementBusiness {
     // ------------------------ PRIVATE METHODS ------------------------
     // -----------------------------------------------------------------
 
+//    private static List<MediaMetadata> setMediaStatuses(List<MediaMetadata> mediaMetadatas) throws IOException {
+//        Map<String, MediaMetadata.UploadStatus> statuses = HLSPackager.getInstance().getUploadStatuses();
+//        String folderName;
+//        for (MediaMetadata mm : mediaMetadatas) {
+//            folderName = mm.getFolderName();
+//            if (statuses.containsKey(folderName)) {
+//                mm.setUploadStatus(statuses.get(folderName));
+//            } else {
+//                if (checkIfProcessingFinished(folderName)) {
+//                    mm.setUploadStatus(MediaMetadata.UploadStatus.FINISHED);
+//                } else {
+//                    mm.setUploadStatus(MediaMetadata.UploadStatus.ERROR);
+//                }
+//            }
+//        }
+//        return mediaMetadatas;
+//    }
+
     private static void deleteMediaFiles(String folderName) throws FolderDoesNotExistException {
         File directory = new File(LocalPaths.MEDIA_FOLDER + folderName + "/");
 
         // Delete the folder and its contents recursively
         if (directory.exists()) {
-            deleteFolder(directory);
+            deleteMediaFolder(folderName);
         }
     }
 
-    private static void deleteFolder(File folder) {
+    private static void deleteMediaFolder(String folderName) {
+        File folder = new File(LocalPaths.MEDIA_FOLDER + folderName + "/");
         File[] contents = folder.listFiles();
         if (contents != null) {
             for (File file : contents) {
                 if (file.isDirectory()) {
-                    deleteFolder(file);
+                    deleteMediaFolder(folderName);
                 } else {
                     file.delete();
                 }
@@ -196,25 +227,26 @@ public class ContentManagementBusiness {
     }
 
     // TODO: create an util class to deal with file management
-    private static void saveMediaMetadata(String title, String description, String folderName) {
+    private static MediaMetadata saveMediaMetadata(String title, String description, String folderName) {
         MediaMetadata metadata;
         if (description == null) {
-            metadata = new MediaMetadata(title, folderName);
+            metadata = new MediaMetadata(title, folderName, MediaMetadata.UploadStatus.PROCESSING);
         } else {
-            metadata = new MediaMetadata(title, description, folderName);
+            metadata = new MediaMetadata(title, description, folderName, MediaMetadata.UploadStatus.PROCESSING);
         }
 
         Session session = HibernateUtil.openSession();
         Transaction transaction = session.beginTransaction();
+
         try {
             session.persist(metadata);
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            throw e;
-        } finally {
-            session.close();
+            e.printStackTrace();
+            throw new RuntimeException("Error persisting media metadata");
         }
+        return metadata;
     }
 
     private static String getFolderName(String title) {
@@ -252,4 +284,5 @@ public class ContentManagementBusiness {
         File file = new File(filePath);
         return file.exists();
     }
+
 }

@@ -19,27 +19,22 @@ public class MediaMetadata {
     private String description;
     @Column(name="folder_name")
     private String folderName;
-    @Transient
+    @Column(name="upload_status")
     private UploadStatus uploadStatus;
 
     public MediaMetadata() {}
 
-    public MediaMetadata(String title, String folderName) {
+    public MediaMetadata(String title, String folderName, UploadStatus uploadStatus) {
         this.title = title;
         this.folderName = folderName;
+        this.uploadStatus = uploadStatus;
     }
 
-    public MediaMetadata(String title, String description, String folderName) {
+    public MediaMetadata(String title, String description, String folderName, UploadStatus uploadStatus) {
         this.title = title;
         this.description = description;
         this.folderName = folderName;
-    }
-
-    public MediaMetadata(int id, String title, String description, String folderName) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.folderName = folderName;
+        this.uploadStatus = uploadStatus;
     }
 
     public int getId() {

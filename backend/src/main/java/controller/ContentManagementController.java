@@ -95,7 +95,7 @@ public class ContentManagementController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMediaMetadatas() {
         try {
-            List<MediaMetadata> metadatas = ContentManagementBusiness.getMediasReadyToPlay();
+            List<MediaMetadata> metadatas = ContentManagementBusiness.getMediaMetadataList();
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(metadatas);
 
@@ -110,7 +110,7 @@ public class ContentManagementController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMediasReadyToPlay() {
         try {
-            List<MediaMetadata> metadatas = ContentManagementBusiness.getMediaMetadataList();
+            List<MediaMetadata> metadatas = ContentManagementBusiness.getMediasReadyToPlay();
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(metadatas);
 
