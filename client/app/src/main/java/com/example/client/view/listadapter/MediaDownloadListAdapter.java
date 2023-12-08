@@ -46,7 +46,17 @@ public class MediaDownloadListAdapter extends ArrayAdapter<MediaMetadata> {
 
         titleTextView.setText(mData.get(position).getTitle());
         descriptionTextView.setText(mData.get(position).getDescription());
-        downloadInteractionButton.setText(mData.get(position).isDownloaded() ? "De": "Dl");
+        String buttonText = "";
+        switch(mData.get(position).getDownloadStatus()) {
+            case DOWNLOADED:
+            case DOWNLOADING:
+                buttonText = "De";
+                break;
+            case NOT_DOWNLOADED:
+                buttonText = "Dw";
+                break;
+        }
+        downloadInteractionButton.setText(buttonText);
 
         setupInteractionClickListener(position, convertView);
 

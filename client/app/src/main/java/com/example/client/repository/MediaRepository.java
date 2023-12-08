@@ -98,19 +98,19 @@ public class MediaRepository {
 
     public List<MediaMetadata> getDownloadStatus(List<MediaMetadata> medias) {
         for (MediaMetadata mm : medias) {
-            mm.setDownloaded(isMediaDownloaded(mm.getId()));
+            mm.setDownloadStatus(getDownloadStatus(mm.getId()));
         }
         return medias;
     }
 
     public MediaMetadata getDownloadStatus(MediaMetadata media) {
-        media.setDownloaded(isMediaDownloaded(media.getId()));
+        media.setDownloadStatus(getDownloadStatus(media.getId()));
         return media;
     }
 
-    private boolean isMediaDownloaded(int mediaId) {
+    private MediaMetadata.DownloadStatus getDownloadStatus(int mediaId) {
         String[] projection = {
-                AppDBContract.DownloadManagementTable.IS_DOWNLOADED
+                AppDBContract.DownloadManagementTable.DOWNLOAD_STATUS
         };
         String selection = AppDBContract.DownloadManagementTable.MEDIA_ID + " = ?";
         String[] selectionArgs = {String.valueOf(mediaId)};
@@ -127,19 +127,19 @@ public class MediaRepository {
 
         assert cursor != null;
         if (cursor.moveToFirst()) {
-            boolean downloaded = (cursor.getInt(cursor.getColumnIndexOrThrow(AppDBContract.DownloadManagementTable.IS_DOWNLOADED)) != 0);
+            String download_status = cursor.getString(cursor.getColumnIndexOrThrow(AppDBContract.DownloadManagementTable.DOWNLOAD_STATUS));
             cursor.close();
-            return downloaded;
+            return MediaMetadata.DownloadStatus.valueOf(download_status);
         } else {
             insertNewMediaToDB(mediaId);
-            return false;
+            return MediaMetadata.DownloadStatus.NOT_DOWNLOADED;
         }
     }
 
     private void insertNewMediaToDB(int mediaId) {
         ContentValues values = new ContentValues();
         values.put(AppDBContract.DownloadManagementTable.MEDIA_ID, mediaId); // Example data for a column named 'COLUMN_NAME'
-        values.put(AppDBContract.DownloadManagementTable.IS_DOWNLOADED, false);
+        values.put(AppDBContract.DownloadManagementTable.DOWNLOAD_STATUS, MediaMetadata.DownloadStatus.NOT_DOWNLOADED.toString());
 
         long newRowId = dbHelper.getWritableDatabase().insert(AppDBContract.DownloadManagementTable.TABLE_NAME, null, values);
 

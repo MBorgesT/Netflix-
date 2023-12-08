@@ -10,13 +10,19 @@ public class MediaMetadata implements Serializable {
         ERROR,
     }
 
+    public enum DownloadStatus {
+        DOWNLOADING,
+        DOWNLOADED,
+        NOT_DOWNLOADED
+    }
+
     private int id;
     private String title;
     private String description;
 
     private String folderName;
     private UploadStatus uploadStatus;
-    private boolean isDownloaded;
+    private DownloadStatus downloadStatus;
 
     public MediaMetadata() {
 
@@ -89,11 +95,11 @@ public class MediaMetadata implements Serializable {
         this.uploadStatus = uploadStatus;
     }
 
-    public boolean isDownloaded() {
-        return isDownloaded;
+    public DownloadStatus getDownloadStatus() {
+        return downloadStatus;
     }
 
-    public void setDownloaded(boolean downloaded) {
-        isDownloaded = downloaded;
+    public void setDownloadStatus(DownloadStatus downloadStatus) {
+        this.downloadStatus = downloadStatus;
     }
 }
