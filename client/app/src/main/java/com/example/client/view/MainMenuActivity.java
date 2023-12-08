@@ -2,14 +2,13 @@ package com.example.client.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.client.R;
-import com.example.client.view.listadapter.MediaListAdapter;
+import com.example.client.view.listadapter.MediaPlayListAdapter;
 import com.example.client.viewmodel.MainMenuViewModel;
 
 public class MainMenuActivity extends AppCompatActivity {
@@ -40,7 +39,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private void setupListAdapter() {
         viewModel.getMediaListLiveData().observe(this, mediaList -> {
-            MediaListAdapter adapter = new MediaListAdapter(this, mediaList);
+            MediaPlayListAdapter adapter = new MediaPlayListAdapter(this, mediaList);
             ListView mediasListView = findViewById(R.id.listMedias);
             mediasListView.setAdapter(adapter);
         });

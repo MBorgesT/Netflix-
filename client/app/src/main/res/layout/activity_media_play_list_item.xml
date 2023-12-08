@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="8dp">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:paddingBottom="8dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/layoutMediaCard"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:background="#d7d7d7"
         android:orientation="vertical"
-        android:layout_alignParentStart="true">
+        android:padding="12dp">
 
         <TextView
             android:id="@+id/textFieldTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:gravity="center_vertical"
-            android:layout_weight="1" />
+            android:textSize="18dp" />
 
         <TextView
             android:id="@+id/textFieldDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:layout_weight="1"/>
+            android:layout_below="@id/textFieldTitle"
+            android:gravity="center_vertical" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
-</RelativeLayout>
+</FrameLayout>

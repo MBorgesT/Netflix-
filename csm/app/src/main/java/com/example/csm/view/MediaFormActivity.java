@@ -4,16 +4,26 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.example.csm.R;
 import com.example.csm.model.MediaMetadata;
 import com.example.csm.model.User;
+import com.example.csm.util.LoadingOverlay;
 import com.example.csm.util.SharedViewModelSource;
 import com.example.csm.viewmodel.ContentManagementViewModel;
 
@@ -39,8 +49,7 @@ public class MediaFormActivity extends AppCompatActivity {
 
     private EditText titleEditText;
     private EditText descriptionEditText;
-    private Button selectFileButton;
-    private Button confirmationButton;
+    private TextView messageTextField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +61,10 @@ public class MediaFormActivity extends AppCompatActivity {
 
         titleEditText = findViewById(R.id.editTextTitle);
         descriptionEditText = findViewById(R.id.editTextDescription);
-        selectFileButton = findViewById(R.id.buttonSelectFile);
-        confirmationButton = findViewById(R.id.buttonConfirmation);
+        messageTextField = findViewById(R.id.textViewMessage);
+
+        Button selectFileButton = findViewById(R.id.buttonSelectFile);
+        Button confirmationButton = findViewById(R.id.buttonConfirmation);
 
         functionality = (Functionality) getIntent().getSerializableExtra("functionality");
         if (functionality == Functionality.UPDATE) {
@@ -85,14 +96,16 @@ public class MediaFormActivity extends AppCompatActivity {
         selectedFileUri = uri;
     }
 
+    @SuppressLint("StaticFieldLeak")
     public void onClickButtonConfirmation(View view) {
         String title = String.valueOf(titleEditText.getText());
         String description = String.valueOf(descriptionEditText.getText());
 
         if (functionality == Functionality.CREATE) {
-            // TODO: add loading animation for this
+            messageTextField.setText("LOADING...");
             File file = createFileFromUri(selectedFileUri);
             viewModel.uploadMedia(title, description, file);
+            messageTextField.setText("");
         } else {
             viewModel.updateMedia(mediaMetadata.getId(), title, description);
         }

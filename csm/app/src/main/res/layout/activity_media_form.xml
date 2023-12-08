@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:theme="@android:style/Theme.Translucent"
-    android:background="#c0000000"
+    android:id="@+id/mediaFormRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#c0000000"
     android:orientation="vertical"
     android:padding="48dp"
+    android:theme="@android:style/Theme.Translucent"
     tools:context=".view.MediaFormActivity">
 
     <EditText
@@ -22,33 +22,31 @@
         android:id="@+id/editTextDescription"
         android:layout_width="match_parent"
         android:layout_height="150dp"
+        android:gravity="top"
         android:hint="Description"
-        android:inputType="text|textMultiLine"
-        android:gravity="top" />
+        android:inputType="text|textMultiLine" />
 
     <Button
         android:id="@+id/buttonSelectFile"
-        android:onClick="onClickButtonSelectFile"
         android:layout_width="match_parent"
         android:layout_height="64dp"
-        android:text="Select File"
-        />
+        android:onClick="onClickButtonSelectFile"
+        android:text="Select File" />
 
     <Button
         android:id="@+id/buttonConfirmation"
-        android:onClick="onClickButtonConfirmation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Upload Media"
-        />
+        android:onClick="onClickButtonConfirmation"
+        android:text="Upload Media" />
 
     <TextView
-        android:id="@+id/textMessage"
+        android:id="@+id/textViewMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:gravity="center"
-        android:textColor="@color/design_default_color_error"/>
+        android:textColor="@color/design_default_color_error" />
 
 </LinearLayout>

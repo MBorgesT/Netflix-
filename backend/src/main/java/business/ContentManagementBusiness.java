@@ -162,7 +162,7 @@ public class ContentManagementBusiness {
     }
 
     public static void deleteMedia(int mediaId) {
-        // TODO: delete chunk hashes too
+        // TODO: stop process if processing
         Session session = HibernateUtil.openSession();
         Transaction transaction = session.beginTransaction();
 

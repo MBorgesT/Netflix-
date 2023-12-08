@@ -7,10 +7,18 @@
     android:padding="16dp"
     tools:context=".view.MainMenuActivity">
 
+    <Button
+        android:id="@+id/buttonDownloadContent"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:text="Download Content"
+        android:layout_marginBottom="12dp"/>
+
     <ListView
         android:id="@+id/listMedias"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        android:layout_below="@+id/buttonDownloadContent"/>
 
 </RelativeLayout>

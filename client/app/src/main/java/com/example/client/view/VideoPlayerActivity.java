@@ -27,7 +27,7 @@ import com.example.client.util.Resources;
 import com.example.client.viewmodel.MainMenuViewModel;
 import com.example.client.viewmodel.VideoPlayerViewModel;
 
-@UnstableApi public class VideoPlayerActivity extends AppCompatActivity {
+public class VideoPlayerActivity extends AppCompatActivity {
 
     private VideoPlayerViewModel viewModel;
 
@@ -92,17 +92,17 @@ import com.example.client.viewmodel.VideoPlayerViewModel;
                         + mediaMetadata.getFolderName()
                         + "/master.m3u8");
 
-        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this,
-                Util.getUserAgent(this, "YourApp"));
-        MediaSource mediaSource = new HlsMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(MediaItem.fromUri(uri));
-        player.setMediaSource(mediaSource);
+//        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this,
+//                Util.getUserAgent(this, "YourApp"));
+//        MediaSource mediaSource = new HlsMediaSource.Factory(dataSourceFactory)
+//                .createMediaSource(MediaItem.fromUri(uri));
+//        player.setMediaSource(mediaSource);
 
-//        MediaItem mediaItem = new MediaItem.Builder()
-//                        .setUri(uri)
-//                        .setMimeType(MimeTypes.APPLICATION_M3U8)
-//                        .build();
-//        player.setMediaItem(mediaItem);
+        MediaItem mediaItem = new MediaItem.Builder()
+                        .setUri(uri)
+                        .setMimeType(MimeTypes.APPLICATION_M3U8)
+                        .build();
+        player.setMediaItem(mediaItem);
 
         player.prepare();
         player.play();

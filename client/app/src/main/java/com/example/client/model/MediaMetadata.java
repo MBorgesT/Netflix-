@@ -16,6 +16,7 @@ public class MediaMetadata implements Serializable {
 
     private String folderName;
     private UploadStatus uploadStatus;
+    private boolean isDownloaded;
 
     public MediaMetadata() {
 
@@ -86,5 +87,13 @@ public class MediaMetadata implements Serializable {
 
     public void setUploadStatus(UploadStatus uploadStatus) {
         this.uploadStatus = uploadStatus;
+    }
+
+    public boolean isDownloaded() {
+        return isDownloaded;
+    }
+
+    public void setDownloaded(boolean downloaded) {
+        isDownloaded = downloaded;
     }
 }
