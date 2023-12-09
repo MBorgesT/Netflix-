@@ -9,13 +9,14 @@
 
     <Button
         android:id="@+id/buttonDownloadContent"
+        android:onClick="onClickButtonDownloadContent"
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:text="Download Content"
         android:layout_marginBottom="12dp"/>
 
     <ListView
-        android:id="@+id/listMedias"
+        android:id="@+id/listPlayMedias"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"

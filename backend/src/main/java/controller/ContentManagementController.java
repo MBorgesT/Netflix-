@@ -140,7 +140,6 @@ public class ContentManagementController {
 
     @DELETE
     @Path("/deleteMedia/{mediaId}")
-    //@Produces(MediaType.APPLICATION_JSON)
     public Response deleteUser(@PathParam("mediaId") int mediaId) {
         try {
             if (!ContentManagementBusiness.doesMediaExist(mediaId)) {
@@ -148,7 +147,25 @@ public class ContentManagementController {
             }
 
             ContentManagementBusiness.deleteMedia(mediaId);
-            return Response.ok().entity("User successfully deleted").build();
+            return Response.ok().entity("Media successfully deleted").build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(500).entity("Internal Server Error").build();
+        }
+    }
+
+    @GET
+    @Path("/getChunkUris/{mediaId}")
+    public Response getChunkUris(@PathParam("mediaId") int mediaId) {
+        try {
+            if (!ContentManagementBusiness.doesMediaExist(mediaId)) {
+                return Response.status(400).entity("Media with the specified id does not exist").build();
+            }
+
+            List<String> uris = ContentManagementBusiness.getChunkUris(mediaId);
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(uris);
+            return Response.ok().entity(json).build();
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(500).entity("Internal Server Error").build();

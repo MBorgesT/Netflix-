@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.example.client.api.MediaAPI;
 import com.example.client.db.AppDBContract;
@@ -32,6 +33,15 @@ public class MediaRepository {
         void onMediaFetch(MediaMetadata media);
 
         void onMediaFetchFailure(String message);
+    }
+
+    public interface OnChunkUrisFetchListener {
+        void onChunkUrisFetch(List<String> uris);
+        void onChunkUrisFetchFailure(String message);
+    }
+
+    public interface OnDownloadStatusUpdateListener {
+        void onDownloadStatusUpdate(String message);
     }
 
     private static MediaRepository instance;
@@ -94,16 +104,57 @@ public class MediaRepository {
         });
     }
 
+    public void fetchChunkUris(int mediaId, OnChunkUrisFetchListener listener) {
+        api.getChunkUris(mediaId).enqueue(new Callback<List<String>>() {
+            @Override
+            public void onResponse(Call<List<String>> call, Response<List<String>> response) {
+                if (response.isSuccessful()) {
+                    listener.onChunkUrisFetch(response.body());
+                } else {
+                    listener.onChunkUrisFetchFailure(response.code() + ": Error on fetching uris");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<String>> call, Throwable t) {
+                listener.onChunkUrisFetchFailure("Error on fetching uris");
+            }
+        });
+    }
+
+    public void updateDownloadStatus(int mediaId, MediaMetadata.DownloadStatus status,
+                                     OnDownloadStatusUpdateListener listener) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("download_status", status.toString());
+
+        String selection = "media_id = ?";
+        String[] selectionArgs = { String.valueOf(mediaId) };
+
+        int rowsAffected = db.update(
+                "download_management",  // Replace "table_name" with the name of your table
+                values,
+                selection,
+                selectionArgs
+        );
+
+        if (rowsAffected > 0) {
+            listener.onDownloadStatusUpdate("Update successful");
+        } else {
+            listener.onDownloadStatusUpdate("Update failed");
+        }
+    }
+
     // ============================== PRIVATE ==============================
 
-    public List<MediaMetadata> getDownloadStatus(List<MediaMetadata> medias) {
+    private List<MediaMetadata> getDownloadStatus(List<MediaMetadata> medias) {
         for (MediaMetadata mm : medias) {
             mm.setDownloadStatus(getDownloadStatus(mm.getId()));
         }
         return medias;
     }
 
-    public MediaMetadata getDownloadStatus(MediaMetadata media) {
+    private MediaMetadata getDownloadStatus(MediaMetadata media) {
         media.setDownloadStatus(getDownloadStatus(media.getId()));
         return media;
     }

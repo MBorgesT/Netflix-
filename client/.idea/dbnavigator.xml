@@ -21,6 +21,9 @@
     <filter-actions connection-id="9fd44156-9f3e-4954-8888-9e56de982c0b" dataset="main.download_management" active-filter-id="" />
     <filter-actions connection-id="9fd44156-9f3e-4954-8888-9e56de982c0b" dataset="main.android_metadata" active-filter-id="" />
   </component>
+  <component name="DBNavigator.Project.ExecutionManager">
+    <retain-sticky-names value="false" />
+  </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
     <filters />

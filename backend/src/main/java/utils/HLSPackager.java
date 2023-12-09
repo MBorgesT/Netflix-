@@ -100,7 +100,7 @@ public final class HLSPackager {
             ChunkHash toPersist;
             byte[] hash;
             for (File file : files) {
-                if (file.isFile() && file.getName().endsWith(".ts")) {
+                if (file.isFile() && (file.getName().endsWith(".ts") || file.getName().endsWith(".m3u8"))) {
                     hash = hashFile(file);
                     toPersist = new ChunkHash(mediaId, file.getName(), hash);
                     session.persist(toPersist);

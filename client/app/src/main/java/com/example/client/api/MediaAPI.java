@@ -16,6 +16,8 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Streaming;
+import retrofit2.http.Url;
 
 public interface MediaAPI {
 
@@ -24,5 +26,12 @@ public interface MediaAPI {
 
     @GET("contentManagement/getMediaById/{mediaId}")
     Call<MediaMetadata> getMediaById(@Path("mediaId") int mediaId);
+
+    @GET("contentManagement/getChunkUris/{mediaId}")
+    Call<List<String>> getChunkUris(@Path("mediaId") int mediaId);
+
+    @GET
+    @Streaming
+    Call<ResponseBody> downloadMedia(@Url String fileUrl);
 
 }

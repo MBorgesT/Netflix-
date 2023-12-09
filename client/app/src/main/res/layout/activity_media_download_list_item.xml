@@ -13,16 +13,23 @@
         android:padding="12dp">
 
         <TextView
+            android:id="@+id/textFieldDownloadStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
             android:id="@+id/textFieldTitle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:gravity="center_vertical"
+            android:layout_below="@id/textFieldDownloadStatus"
             android:textSize="18dp" />
 
         <TextView
             android:id="@+id/textFieldDescription"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/textFieldTitle"
             android:gravity="center_vertical" />
@@ -31,7 +38,7 @@
             android:id="@+id/buttonDownloadInteraction"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_toEndOf="@id/textFieldTitle"/>
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 

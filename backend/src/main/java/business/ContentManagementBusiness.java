@@ -2,6 +2,7 @@ package business;
 
 import exceptions.EmptyParameterException;
 import exceptions.FolderDoesNotExistException;
+import model.ChunkHash;
 import model.MediaMetadata;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -14,6 +15,7 @@ import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
@@ -180,27 +182,26 @@ public class ContentManagementBusiness {
         }
     }
 
+    // TODO: store this info at the nosql db on upload and retrieve from there
+    public static List<String> getChunkUris(int mediaId) {
+        MediaMetadata media = getMediaById(mediaId);
+        File folder = new File(LocalPaths.MEDIA_FOLDER + media.getFolderName() + "/");
+        File[] files = folder.listFiles();
+
+        ArrayList<String> uris = new ArrayList<>();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile() && (file.getName().endsWith(".ts") || file.getName().endsWith(".m3u8"))) {
+                    uris.add(file.getName());
+                }
+            }
+        }
+        return uris;
+    }
+
     // -----------------------------------------------------------------
     // ------------------------ PRIVATE METHODS ------------------------
     // -----------------------------------------------------------------
-
-//    private static List<MediaMetadata> setMediaStatuses(List<MediaMetadata> mediaMetadatas) throws IOException {
-//        Map<String, MediaMetadata.UploadStatus> statuses = HLSPackager.getInstance().getUploadStatuses();
-//        String folderName;
-//        for (MediaMetadata mm : mediaMetadatas) {
-//            folderName = mm.getFolderName();
-//            if (statuses.containsKey(folderName)) {
-//                mm.setUploadStatus(statuses.get(folderName));
-//            } else {
-//                if (checkIfProcessingFinished(folderName)) {
-//                    mm.setUploadStatus(MediaMetadata.UploadStatus.FINISHED);
-//                } else {
-//                    mm.setUploadStatus(MediaMetadata.UploadStatus.ERROR);
-//                }
-//            }
-//        }
-//        return mediaMetadatas;
-//    }
 
     private static void deleteMediaFiles(String folderName) throws FolderDoesNotExistException {
         File directory = new File(LocalPaths.MEDIA_FOLDER + folderName + "/");

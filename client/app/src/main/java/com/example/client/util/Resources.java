@@ -11,6 +11,15 @@ public class Resources {
     public static final String backendResourcesUrl = baseUrl + "resources/";
 
     private static DBHelper dbHelper;
+    private static Context appContext;
+
+    public static void setAppContext(Context context) {
+        Resources.appContext = context;
+    }
+
+    public static Context getAppContext() {
+        return appContext;
+    }
 
     public static void createDBHelper(Context context) {
         dbHelper = new DBHelper(context);
