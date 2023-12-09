@@ -80,9 +80,10 @@ public class MediaDownloadListAdapter extends ArrayAdapter<MediaMetadata> {
                 buttonText = "De";
                 break;
             case DOWNLOADING:
+                // TODO: solve this making more than this button invisible
                 downloadStatusTextView.setText("DOWNLOADING");
                 downloadStatusTextView.setTextColor(Color.YELLOW);
-                downloadStatusTextView.setVisibility(View.GONE);
+                downloadInteractionButton.setVisibility(View.INVISIBLE);
                 break;
             case NOT_DOWNLOADED:
                 downloadStatusTextView.setText("NOT DOWNLOADED");

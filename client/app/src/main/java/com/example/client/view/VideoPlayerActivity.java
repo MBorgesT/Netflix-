@@ -6,6 +6,7 @@ import androidx.media3.common.MediaItem;
 import androidx.media3.common.MimeTypes;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.common.util.Util;
+import androidx.media3.datasource.DataSource;
 import androidx.media3.datasource.DefaultDataSourceFactory;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.hls.HlsMediaSource;
@@ -18,6 +19,7 @@ import androidx.media3.ui.PlayerView;
 
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -33,8 +35,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
 
     private ExoPlayer player;
     private PlayerView playerView;
-
-    private int mediaId;
     private MediaMetadata mediaMetadata;
 
     @Override
@@ -45,21 +45,36 @@ public class VideoPlayerActivity extends AppCompatActivity {
         ViewModelProvider viewModelProvider = new ViewModelProvider(this);
         viewModel = viewModelProvider.get(VideoPlayerViewModel.class);
 
-        mediaId = getIntent().getIntExtra("mediaId", 0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mediaMetadata = getIntent().getSerializableExtra("mediaMetadata", MediaMetadata.class);
+        }
 
         setupVideoPlayer();
         setupToast();
-        setupMediaFetchObserver();
-        fetchMediaInfo();
+        if (mediaMetadata.getDownloadStatus() == MediaMetadata.DownloadStatus.DOWNLOADED) {
+            playVideoLocal();
+        } else {
+            playVideoWeb();
+//            setupMediaFetchObserver();
+        }
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (player != null) {
+            player.release();
+            player = null;
+        }
+    }
+
     private void setupVideoPlayer() {
-        TrackSelector trackSelector = new DefaultTrackSelector(this);
+        //TrackSelector trackSelector = new DefaultTrackSelector(this);
 
         player = new ExoPlayer.Builder(this)
-                .setTrackSelector(trackSelector)
+//                .setTrackSelector(trackSelector)
                 .build();
 
         playerView = findViewById(R.id.playerView);
@@ -78,15 +93,11 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private void setupMediaFetchObserver() {
         viewModel.getMediaMetadataLiveData().observe(this, media -> {
             mediaMetadata = media;
-            playVideo();
+            playVideoWeb();
         });
     }
 
-    private void fetchMediaInfo() {
-        viewModel.fetchMediaById(mediaId);
-    }
-
-    private void playVideo() {
+    private void playVideoWeb() {
         Uri uri = Uri.parse(
                 Resources.backendResourcesUrl
                         + mediaMetadata.getFolderName()
@@ -105,7 +116,19 @@ public class VideoPlayerActivity extends AppCompatActivity {
         player.setMediaItem(mediaItem);
 
         player.prepare();
-        player.play();
+//        player.play();
+        player.setPlayWhenReady(true);
+    }
+
+    private void playVideoLocal() {
+        Uri videoUri = Uri.parse(
+                Resources.getMediaDownloadFolder() +
+                        mediaMetadata.getFolderName() +
+                        "/master.m3u8");
+        MediaItem mediaItem = MediaItem.fromUri(videoUri);
+        player.setMediaItem(mediaItem);
+        player.prepare();
+        player.setPlayWhenReady(true);
     }
 
 }

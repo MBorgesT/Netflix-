@@ -13,11 +13,21 @@
         android:padding="12dp">
 
         <TextView
+            android:id="@+id/textFieldDownloaded"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10dp"
+            android:textColor="#00FF00"
+            android:layout_marginBottom="4dp"
+            android:text="READY TO PLAY"/>
+
+        <TextView
             android:id="@+id/textFieldTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:gravity="center_vertical"
+            android:layout_below="@id/textFieldDownloaded"
             android:textSize="18dp" />
 
         <TextView

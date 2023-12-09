@@ -29,4 +29,8 @@ public class Resources {
         return dbHelper;
     }
 
+    public static String getMediaDownloadFolder() {
+        return Resources.getAppContext().getFilesDir() + "/MediaDownload/";
+    }
+
 }

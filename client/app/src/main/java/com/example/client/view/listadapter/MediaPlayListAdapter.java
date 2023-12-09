@@ -42,6 +42,13 @@ public class MediaPlayListAdapter extends ArrayAdapter<MediaMetadata> {
         cardLayout = convertView.findViewById(R.id.layoutMediaCard);
         TextView titleTextView = convertView.findViewById(R.id.textFieldTitle);
         TextView descriptionTextView = convertView.findViewById(R.id.textFieldDescription);
+        TextView downloadedTextView = convertView.findViewById(R.id.textFieldDownloaded);
+
+        if (mData.get(position).getDownloadStatus() == MediaMetadata.DownloadStatus.DOWNLOADED) {
+            downloadedTextView.setVisibility(View.VISIBLE);
+        } else {
+            downloadedTextView.setVisibility(View.GONE);
+        }
 
         titleTextView.setText(mData.get(position).getTitle());
         descriptionTextView.setText(mData.get(position).getDescription());
@@ -56,7 +63,7 @@ public class MediaPlayListAdapter extends ArrayAdapter<MediaMetadata> {
             @Override
             public void onClick(View view) {
                 Intent newIntent = new Intent(mContext, VideoPlayerActivity.class);
-                newIntent.putExtra("mediaId", mData.get(position).getId());
+                newIntent.putExtra("mediaMetadata", mData.get(position));
                 mContext.startActivity(newIntent);
             }
         });

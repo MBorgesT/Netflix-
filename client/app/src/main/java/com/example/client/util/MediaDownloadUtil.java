@@ -38,7 +38,7 @@ public class MediaDownloadUtil {
                                      OnMediaDownloadListener listener) {
         MediaAPI api = ApiBuilder.create(MediaAPI.class);
 
-        String folderPath = Resources.getAppContext().getFilesDir() + "/MediaDownload/" + folderName;
+        String folderPath = Resources.getMediaDownloadFolder() + folderName;
         createFolderIfDoesntExist(folderPath);
 
         CountDownLatch latch = new CountDownLatch(uris.size());
@@ -96,7 +96,7 @@ public class MediaDownloadUtil {
     }
 
     public static void deleteMediaDownloadFolder(String folderName) {
-        String folderPath = Resources.getAppContext().getFilesDir() + "/MediaDownload/" + folderName;
+        String folderPath = Resources.getMediaDownloadFolder() + folderName;
         File toDelete = new File(folderPath);
         deleteRecursive(toDelete);
     }

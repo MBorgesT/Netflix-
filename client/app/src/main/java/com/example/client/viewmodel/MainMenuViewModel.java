@@ -15,14 +15,12 @@ public class MainMenuViewModel extends ViewModel {
 
     private final MutableLiveData<List<MediaMetadata>> mediaListLiveData;
     private final MutableLiveData<String> messageLiveData;
-    private final MutableLiveData<List<String>> chunkUrisLiveData;
 
     public MainMenuViewModel() {
         mediaRepository = MediaRepository.getInstance();
 
         mediaListLiveData = new MutableLiveData<>();
         messageLiveData = new MutableLiveData<>();
-        chunkUrisLiveData = new MutableLiveData<>();
     }
 
     public MutableLiveData<List<MediaMetadata>> getMediaListLiveData() {
@@ -73,6 +71,7 @@ public class MainMenuViewModel extends ViewModel {
         mediaRepository.updateDownloadStatus(
                 mediaId, MediaMetadata.DownloadStatus.DOWNLOADING,
                 listener);
+        fetchMedias();
 
         MediaDownloadUtil.downloadFiles(uris, folderName,
                 new MediaDownloadUtil.OnMediaDownloadListener() {
@@ -81,6 +80,7 @@ public class MainMenuViewModel extends ViewModel {
                 mediaRepository.updateDownloadStatus(
                         mediaId, MediaMetadata.DownloadStatus.DOWNLOADED,
                         listener);
+                fetchMedias();
             }
 
             @Override
@@ -88,6 +88,7 @@ public class MainMenuViewModel extends ViewModel {
                 mediaRepository.updateDownloadStatus(
                         mediaId, MediaMetadata.DownloadStatus.NOT_DOWNLOADED,
                         listener);
+                fetchMedias();
             }
         });
     }
