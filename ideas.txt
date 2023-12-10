@@ -1,1 +1,0 @@
-Fazer uma pool de n threads para a execução do processamento via ffmpeg
