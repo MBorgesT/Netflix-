@@ -13,16 +13,6 @@ services:
       vpcbr:
         ipv4_address: 10.5.0.5
 
-  # netflix_cassandra:
-  #   image: cassandra:4.1.3
-  #   ports:
-  #     - 9042:9042
-  #   environment:
-  #     - CASSANDRA_CLUSTER_NAME=cloudinfra 
-  #   networks:
-  #     vpcbr:
-  #       ipv4_address: 10.5.0.6
-
   netflix_nginx:
     build: nginx/
     volumes:

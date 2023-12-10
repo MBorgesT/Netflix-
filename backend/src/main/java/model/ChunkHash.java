@@ -13,10 +13,6 @@ public class ChunkHash {
     @Column(name="media_id")
     private int mediaId;
 
-//    @OneToMany(fetch=FetchType.LAZY)
-//    @JoinColumn(name="media_id")
-//    private MediaMetadata mediaMetadata;
-
     @Column(name="file_name")
     private String fileName;
 

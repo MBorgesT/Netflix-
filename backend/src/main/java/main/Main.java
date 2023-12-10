@@ -8,12 +8,9 @@ import org.eclipse.jetty.proxy.ProxyServlet;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.eclipse.jetty.util.security.Constraint;
-import org.eclipse.jetty.webapp.WebAppContext;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;

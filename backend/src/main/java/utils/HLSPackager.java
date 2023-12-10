@@ -163,22 +163,6 @@ public final class HLSPackager {
         }
     }
 
-    private void logProcessOutput(String processName) throws IOException {
-        Process p = processes.get(processName);
-
-//        BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//        ArrayList<String> list = new ArrayList<>();
-//        String line;
-//        while ((line = stdError.readLine()) != null) {
-//            list.add(line);
-//        }
-//        String output = list.stream().map(Object::toString)
-//                .collect(Collectors.joining("\\\n"));
-
-        String output = IOUtils.toString(p.getInputStream(), Charset.defaultCharset());
-        System.out.println(output);
-    }
-
     private String getProcessError(String processName) throws IOException {
         Process p = processes.get(processName);
 
@@ -187,20 +171,6 @@ public final class HLSPackager {
         ArrayList<String> list = new ArrayList<>();
         String line;
         while ((line = stdError.readLine()) != null) {
-            list.add(line);
-        }
-        return list.stream().map(Object::toString)
-                .collect(Collectors.joining("\n"));
-    }
-
-    private String getProcessOutput(String processName) throws IOException {
-        Process p = processes.get(processName);
-
-        BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-        ArrayList<String> list = new ArrayList<>();
-        String line;
-        while ((line = stdInput.readLine()) != null) {
             list.add(line);
         }
         return list.stream().map(Object::toString)

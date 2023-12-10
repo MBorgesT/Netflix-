@@ -30,8 +30,6 @@ public class VideoPlayerViewModel extends ViewModel {
         mediaMetadataLiveData = new MutableLiveData<>();
         messageLiveData = new MutableLiveData<>();
         streamingSourceLiveData = new MutableLiveData<>();
-
-//        createOnMediaFetchListener();
     }
 
     public MutableLiveData<MediaMetadata> getMediaMetadataLiveData() {

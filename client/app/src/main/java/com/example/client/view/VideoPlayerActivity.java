@@ -1,6 +1,5 @@
 package com.example.client.view;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.MediaItem;
@@ -25,12 +24,8 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private VideoPlayerViewModel viewModel;
 
     private ExoPlayer player;
-    private PlayerView playerView;
-    private int mediaId;
     private MediaMetadata mediaMetadata;
-    private String streamingSourceAddress;
 
-    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +34,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         ViewModelProvider viewModelProvider = new ViewModelProvider(this);
         viewModel = viewModelProvider.get(VideoPlayerViewModel.class);
 
-        mediaId = getIntent().getIntExtra("mediaId", -1);
+        int mediaId = getIntent().getIntExtra("mediaId", -1);
         viewModel.fetchMediaById(mediaId);
 
         setupVideoPlayer();
@@ -59,13 +54,10 @@ public class VideoPlayerActivity extends AppCompatActivity {
     }
 
     private void setupVideoPlayer() {
-        //TrackSelector trackSelector = new DefaultTrackSelector(this);
-
         player = new ExoPlayer.Builder(this)
-//                .setTrackSelector(trackSelector)
                 .build();
 
-        playerView = findViewById(R.id.playerView);
+        PlayerView playerView = findViewById(R.id.playerView);
         playerView.setPlayer(player);
     }
 
@@ -86,7 +78,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
             } else {
                 setupStreamingSourceObserver();
                 viewModel.fetchStreamingSources(mediaMetadata.getId());
-//                playVideoWeb(Resources.backendResourcesUrl);
             }
         });
     }
@@ -102,12 +93,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 sourceAddress
                         + mediaMetadata.getFolderName()
                         + "/master.m3u8");
-
-//        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this,
-//                Util.getUserAgent(this, "YourApp"));
-//        MediaSource mediaSource = new HlsMediaSource.Factory(dataSourceFactory)
-//                .createMediaSource(MediaItem.fromUri(uri));
-//        player.setMediaSource(mediaSource);
 
         MediaItem mediaItem = new MediaItem.Builder()
                         .setUri(uri)

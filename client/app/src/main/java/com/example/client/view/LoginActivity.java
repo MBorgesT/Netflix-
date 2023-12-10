@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.client.view.MainMenuActivity;
 import com.example.client.R;
 import com.example.client.viewmodel.LoginViewModel;
 
