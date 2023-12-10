@@ -9,6 +9,10 @@
         <servlet-name>JerseyServlet</servlet-name>
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
+            <param-name>jersey.config.server.provider.classnames</param-name>
+            <param-value>org.glassfish.jersey.media.multipart.MultiPartFeature</param-value>
+        </init-param>
+        <init-param>
             <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>controller</param-value>
         </init-param>
@@ -18,7 +22,7 @@
         <servlet-class>org.eclipse.jetty.proxy.ProxyServlet.Transparent</servlet-class>
         <init-param>
             <param-name>proxyTo</param-name>
-            <param-value>http://127.0.0.1:8081</param-value> <!-- Change this URL accordingly -->
+            <param-value>http://10.5.0.7:8081</param-value> <!-- Change this URL accordingly -->
         </init-param>
     </servlet>
 

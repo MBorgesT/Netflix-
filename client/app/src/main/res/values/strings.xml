@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">client</string>
+    <string name="app_name">Stream++</string>
     <string name="title_activity_video_player">VideoPlayer</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>

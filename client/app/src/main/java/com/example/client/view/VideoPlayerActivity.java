@@ -1,22 +1,14 @@
 package com.example.client.view;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MimeTypes;
-import androidx.media3.common.util.UnstableApi;
-import androidx.media3.common.util.Util;
-import androidx.media3.datasource.DataSource;
-import androidx.media3.datasource.DefaultDataSourceFactory;
 import androidx.media3.exoplayer.ExoPlayer;
-import androidx.media3.exoplayer.hls.HlsMediaSource;
-import androidx.media3.exoplayer.source.MediaSource;
-import androidx.media3.exoplayer.trackselection.AdaptiveTrackSelection;
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
-import androidx.media3.exoplayer.trackselection.MappingTrackSelector;
-import androidx.media3.exoplayer.trackselection.TrackSelector;
 import androidx.media3.ui.PlayerView;
 
+import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Build;
@@ -26,7 +18,6 @@ import android.widget.Toast;
 import com.example.client.R;
 import com.example.client.model.MediaMetadata;
 import com.example.client.util.Resources;
-import com.example.client.viewmodel.MainMenuViewModel;
 import com.example.client.viewmodel.VideoPlayerViewModel;
 
 public class VideoPlayerActivity extends AppCompatActivity {
@@ -35,8 +26,11 @@ public class VideoPlayerActivity extends AppCompatActivity {
 
     private ExoPlayer player;
     private PlayerView playerView;
+    private int mediaId;
     private MediaMetadata mediaMetadata;
+    private String streamingSourceAddress;
 
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,18 +39,12 @@ public class VideoPlayerActivity extends AppCompatActivity {
         ViewModelProvider viewModelProvider = new ViewModelProvider(this);
         viewModel = viewModelProvider.get(VideoPlayerViewModel.class);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            mediaMetadata = getIntent().getSerializableExtra("mediaMetadata", MediaMetadata.class);
-        }
+        mediaId = getIntent().getIntExtra("mediaId", -1);
+        viewModel.fetchMediaById(mediaId);
 
         setupVideoPlayer();
         setupToast();
-        if (mediaMetadata.getDownloadStatus() == MediaMetadata.DownloadStatus.DOWNLOADED) {
-            playVideoLocal();
-        } else {
-            playVideoWeb();
-//            setupMediaFetchObserver();
-        }
+        setupMediaFetchObserver();
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
@@ -93,13 +81,25 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private void setupMediaFetchObserver() {
         viewModel.getMediaMetadataLiveData().observe(this, media -> {
             mediaMetadata = media;
-            playVideoWeb();
+            if (mediaMetadata.getDownloadStatus() == MediaMetadata.DownloadStatus.DOWNLOADED) {
+                playVideoLocal();
+            } else {
+                setupStreamingSourceObserver();
+                viewModel.fetchStreamingSources(mediaMetadata.getId());
+//                playVideoWeb(Resources.backendResourcesUrl);
+            }
         });
     }
 
-    private void playVideoWeb() {
+    private void setupStreamingSourceObserver() {
+        viewModel.getStreamingSourceLiveData().observe(this, sourceAddress -> {
+            playVideoWeb(sourceAddress);
+        });
+    }
+
+    private void playVideoWeb(String sourceAddress) {
         Uri uri = Uri.parse(
-                Resources.backendResourcesUrl
+                sourceAddress
                         + mediaMetadata.getFolderName()
                         + "/master.m3u8");
 
@@ -116,7 +116,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
         player.setMediaItem(mediaItem);
 
         player.prepare();
-//        player.play();
         player.setPlayWhenReady(true);
     }
 

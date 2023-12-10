@@ -13,8 +13,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //NetworkUtil.getInstance().initRequestQueue(this);
-
         Intent newIntent = new Intent(this, LoginActivity.class);
         this.startActivity(newIntent);
     }

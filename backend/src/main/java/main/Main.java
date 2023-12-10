@@ -1,9 +1,5 @@
 package main;
 
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
-import org.eclipse.jetty.security.SecurityHandler;
-import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -18,6 +14,8 @@ import java.util.logging.Logger;
 
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import utils.HibernateUtil;
 import utils.LocalPaths;
@@ -57,9 +55,9 @@ public class Main {
         server.setHandler(context);
 
         // Add your Jersey application as a servlet
-        ServletHolder jerseyServlet = context.addServlet(ServletContainer.class, "/api/*");
-        jerseyServlet.setInitOrder(0);
-        jerseyServlet.setInitParameter("jersey.config.server.provider.packages", "controller");
+        ServletHolder apiServlet = context.addServlet(ServletContainer.class, "/api/*");
+        apiServlet.setInitOrder(0);
+        apiServlet.setInitParameter("jersey.config.server.provider.packages", "controller");
 
         // Add a ProxyServlet for other resources (e.g., proxying to another service)
         ServletHolder proxyServlet = context.addServlet(ProxyServlet.Transparent.class, "/resources/*");
@@ -70,23 +68,36 @@ public class Main {
     }
 
     public static Server startServer2() throws Exception {
+        createUploadFolder();
+
+        // Create a ResourceConfig instance and register packages or classes
+        ResourceConfig config = new ResourceConfig();
+        config.packages("controller");
+        config.register(MultiPartFeature.class);
+
+        // Create a ServletContainer with the ResourceConfig
+        ServletContainer servletContainer = new ServletContainer(config);
+
+        // Create a ServletContextHandler
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+
+        // Add your Jersey application as a servlet
+        ServletHolder apiServlet = new ServletHolder(servletContainer);
+        context.addServlet(apiServlet, "/api/*");
+        apiServlet.setInitOrder(0);
+
+        // Add a ProxyServlet for other resources (e.g., proxying to another service)
+        ServletHolder proxyServlet = context.addServlet(ProxyServlet.Transparent.class, "/resources/*");
+        proxyServlet.setInitParameter("proxyTo", LocalPaths.NGINX_ADDRESS); // Change the proxyTo URL as needed
+
+        // Create and start the server
         Server server = new Server(LocalPaths.SERVER_PORT);
-
-        // Define the context path and location of the webapp (where the web.xml is located)
-        String webappDir = "resources/"; // Replace this with the path to your webapp directory
-        String contextPath = "/"; // Context path specified in web.xml
-
-        WebAppContext webapp = new WebAppContext();
-        webapp.setContextPath(contextPath);
-        webapp.setDescriptor(webappDir + "web.xml");
-        webapp.setResourceBase(webappDir);
-
-        server.setHandler(webapp);
-
+        server.setHandler(context);
         server.start();
+
         return server;
     }
-
 
     public static void main(String[] args) throws Exception {
 

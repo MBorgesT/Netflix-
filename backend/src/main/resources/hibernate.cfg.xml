@@ -9,6 +9,7 @@
         <mapping class="model.User" />
         <mapping class="model.MediaMetadata" />
         <mapping class="model.ChunkHash" />
+        <mapping class="model.MeshStreamAvailability" />
     </session-factory>
 </hibernate-configuration>
 

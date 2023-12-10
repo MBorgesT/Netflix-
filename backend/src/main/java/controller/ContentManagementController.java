@@ -1,16 +1,16 @@
 package controller;
 
 import business.ContentManagementBusiness;
-import business.UserManagementBusiness;
+import business.MeshStreamBusiness;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import exceptions.EmptyParameterException;
-import exceptions.InvalidRoleException;
 import jakarta.inject.Singleton;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import model.MediaMetadata;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import exceptions.FileAlreadyUploadedException;
 import org.json.JSONException;
@@ -18,7 +18,6 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.util.List;
-import java.util.Map;
 
 @Singleton
 @Path("/contentManagement")
@@ -169,6 +168,55 @@ public class ContentManagementController {
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(500).entity("Internal Server Error").build();
+        }
+    }
+
+    @POST
+    @Path("/signalStreamAvailability/{mediaId}")
+    public Response signalMeshAvailability(@PathParam("mediaId") int mediaId, @Context HttpServletRequest request) {
+        try {
+            if (!ContentManagementBusiness.doesMediaExist(mediaId)) {
+                return Response.status(400).entity("Media with the specified id does not exist").build();
+            }
+
+            String clientIP = request.getRemoteAddr();
+            MeshStreamBusiness.signalStreamAvailability(mediaId, clientIP);
+            return Response.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(500).entity("Internal Server Error").build();
+        }
+    }
+
+    @POST
+    @Path("/signalStreamUnavailability/{mediaId}")
+    public Response signalMeshUnavailability(@PathParam("mediaId") int mediaId, @Context HttpServletRequest request) {
+        try {
+            if (!ContentManagementBusiness.doesMediaExist(mediaId)) {
+                return Response.status(400).entity("Media with the specified id does not exist").build();
+            }
+
+            String clientIP = request.getRemoteAddr();
+            MeshStreamBusiness.signalStreamUnavailability(mediaId, clientIP);
+            return Response.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(500).entity("Internal Server Error").build();
+        }
+    }
+
+    @GET
+    @Path("/getStreamingSources/{mediaId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getStreamingSources(@PathParam("mediaId") int mediaId) {
+        try {
+            List<String> sources = MeshStreamBusiness.getStreamingSources(mediaId);
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(sources);
+
+            return Response.status(Response.Status.OK).entity(json).build();
+        } catch (IOException e) {
+            return Response.status(500).build();
         }
     }
 

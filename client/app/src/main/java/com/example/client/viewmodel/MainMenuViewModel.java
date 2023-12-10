@@ -80,6 +80,12 @@ public class MainMenuViewModel extends ViewModel {
                 mediaRepository.updateDownloadStatus(
                         mediaId, MediaMetadata.DownloadStatus.DOWNLOADED,
                         listener);
+                mediaRepository.singalMeshAvailability(mediaId, new MediaRepository.OnSignalAvailabityListener() {
+                    @Override
+                    public void onSignalAvailability(String message) {
+                        messageLiveData.setValue(message);
+                    }
+                });
                 fetchMedias();
             }
 
@@ -106,6 +112,12 @@ public class MainMenuViewModel extends ViewModel {
         mediaRepository.updateDownloadStatus(
                 mediaId, MediaMetadata.DownloadStatus.NOT_DOWNLOADED,
                 listener);
+        mediaRepository.singalMeshUnavailability(mediaId, new MediaRepository.OnSignalAvailabityListener() {
+            @Override
+            public void onSignalAvailability(String message) {
+                messageLiveData.setValue(message);
+            }
+        });
     }
 
 }

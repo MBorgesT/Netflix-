@@ -87,7 +87,7 @@ public class ContentManagementBusiness {
                 try {
                     HLSPackager packager = HLSPackager.getInstance();
                     packager.hashChunks(folderPath, metadata.getId(), session);
-                    packager.createFinishedFlag(folderPath);
+//                    packager.createFinishedFlag(folderPath);
 
                     metadata.setUploadStatus(MediaMetadata.UploadStatus.FINISHED);
                     session.update(metadata);
@@ -181,6 +181,7 @@ public class ContentManagementBusiness {
             throw new RuntimeException(e);
         }
     }
+
 
     // TODO: store this info at the nosql db on upload and retrieve from there
     public static List<String> getChunkUris(int mediaId) {
@@ -285,5 +286,4 @@ public class ContentManagementBusiness {
         File file = new File(filePath);
         return file.exists();
     }
-
 }

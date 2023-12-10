@@ -109,18 +109,18 @@ public final class HLSPackager {
         }
     }
 
-    public void createFinishedFlag(String folderPath) throws RuntimeException, IOException, InterruptedException {
-        String[] commandList = new String[]{
-                "/bin/bash", "-c", LocalPaths.FLAG_SCRIPT
-        };
-        ProcessBuilder processBuilder = new ProcessBuilder(commandList);
-        processBuilder.directory(new File(folderPath));
-        Process p = processBuilder.start();
-        int result = p.waitFor();
-        if (result != 0) {
-            throw new RuntimeException("Error creating finished flag");
-        }
-    }
+//    public void createFinishedFlag(String folderPath) throws RuntimeException, IOException, InterruptedException {
+//        String[] commandList = new String[]{
+//                "/bin/bash", "-c", LocalPaths.FLAG_SCRIPT
+//        };
+//        ProcessBuilder processBuilder = new ProcessBuilder(commandList);
+//        processBuilder.directory(new File(folderPath));
+//        Process p = processBuilder.start();
+//        int result = p.waitFor();
+//        if (result != 0) {
+//            throw new RuntimeException("Error creating finished flag");
+//        }
+//    }
 
     // -----------------------------------------------------------------
     // ------------------------ PRIVATE METHODS ------------------------

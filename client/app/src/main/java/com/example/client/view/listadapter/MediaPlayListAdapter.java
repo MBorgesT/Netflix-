@@ -63,7 +63,8 @@ public class MediaPlayListAdapter extends ArrayAdapter<MediaMetadata> {
             @Override
             public void onClick(View view) {
                 Intent newIntent = new Intent(mContext, VideoPlayerActivity.class);
-                newIntent.putExtra("mediaMetadata", mData.get(position));
+                MediaMetadata chosen = mData.get(position);
+                newIntent.putExtra("mediaId", chosen.getId());
                 mContext.startActivity(newIntent);
             }
         });

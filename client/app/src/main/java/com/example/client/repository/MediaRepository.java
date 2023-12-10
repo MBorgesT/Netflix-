@@ -1,6 +1,5 @@
 package com.example.client.repository;
 
-import android.app.Application;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -15,8 +14,7 @@ import com.example.client.util.Resources;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -42,6 +40,15 @@ public class MediaRepository {
 
     public interface OnDownloadStatusUpdateListener {
         void onDownloadStatusUpdate(String message);
+    }
+
+    public interface OnSignalAvailabityListener {
+        void onSignalAvailability(String message);
+    }
+
+    public interface OnStreamingSourcesFetchListener {
+        void onStreamingSourcesFetch(List<String> sources);
+        void onStreamingSourcesFetchFailed(String message);
     }
 
     private static MediaRepository instance;
@@ -143,6 +150,60 @@ public class MediaRepository {
         } else {
             listener.onDownloadStatusUpdate("Update failed");
         }
+    }
+
+    public void singalMeshAvailability(int mediaId, OnSignalAvailabityListener listener) {
+        api.signalStreamAvailability(mediaId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    listener.onSignalAvailability("Streaming availability signaled");
+                } else {
+                    listener.onSignalAvailability("Error on signaling streaming availability");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                listener.onSignalAvailability("Error on signaling streaming availability");
+            }
+        });
+    }
+
+    public void singalMeshUnavailability(int mediaId, OnSignalAvailabityListener listener) {
+        api.signalStreamUnavailability(mediaId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    listener.onSignalAvailability("Streaming availability signaled");
+                } else {
+                    listener.onSignalAvailability("Error on signaling streaming availability");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                listener.onSignalAvailability("Error on signaling streaming availability");
+            }
+        });
+    }
+
+    public void fetchStreamingSources(int mediaId, OnStreamingSourcesFetchListener listener) {
+        api.getStreamingSources(mediaId).enqueue(new Callback<List<String>>() {
+            @Override
+            public void onResponse(Call<List<String>> call, Response<List<String>> response) {
+                if (response.isSuccessful()) {
+                    listener.onStreamingSourcesFetch(response.body());
+                } else {
+                    listener.onStreamingSourcesFetchFailed("Failed to fetch streaming sources");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<String>> call, Throwable t) {
+                listener.onStreamingSourcesFetchFailed("Failed to fetch streaming sources");
+            }
+        });
     }
 
     // ============================== PRIVATE ==============================
