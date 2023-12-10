@@ -25,3 +25,9 @@ Hosts processed video resources that are served to the Client application.
 ### MariaDB database
 
 Serves as persistent storage for the backend system.
+
+### Files on the main folder
+
+* `docker-compose.yml`, as previously mentioned, orchestrates the project's containers;
+* `packaging.sh` is utilized by the backend to process the videos into a HLS-compatible format;
+* `db_ddl.sql` contains the script for creating the database.
