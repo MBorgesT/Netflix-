@@ -33,43 +33,44 @@ public class Main {
 
     }
 
-    public static Server startServer() throws Exception {
-
-        createUploadFolder();
-
-//        // scan packages
-//        final ResourceConfig config = new ResourceConfig().packages("controller");
+//    public static Server startServerAlternative() throws Exception {
 //
-//        final Server server = JettyHttpContainerFactory.createServer(URI.create(BASE_URI), config, false);
+//        createUploadFolder();
+//
+////        // scan packages
+////        final ResourceConfig config = new ResourceConfig().packages("controller");
+////
+////        final Server server = JettyHttpContainerFactory.createServer(URI.create(BASE_URI), config, false);
+////        server.start();
+//
+//        Server server = new Server(LocalPaths.SERVER_PORT);
+//
+//        // Create a ServletContextHandler
+//        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+//        context.setContextPath("/");
+//
+//        server.setHandler(context);
+//
+//        // Add your Jersey application as a servlet
+//        ServletHolder apiServlet = context.addServlet(ServletContainer.class, "/api/*");
+//        apiServlet.setInitOrder(0);
+//        apiServlet.setInitParameter("jersey.config.server.provider.packages", "controller");
+//
+//        // Add a ProxyServlet for other resources (e.g., proxying to another service)
+//        ServletHolder proxyServlet = context.addServlet(ProxyServlet.Transparent.class, "/resources/*");
+//        proxyServlet.setInitParameter("proxyTo", LocalPaths.NGINX_ADDRESS); // Change the proxyTo URL as needed
+//
 //        server.start();
+//        return server;
+//    }
 
-        Server server = new Server(LocalPaths.SERVER_PORT);
-
-        // Create a ServletContextHandler
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-
-        server.setHandler(context);
-
-        // Add your Jersey application as a servlet
-        ServletHolder apiServlet = context.addServlet(ServletContainer.class, "/api/*");
-        apiServlet.setInitOrder(0);
-        apiServlet.setInitParameter("jersey.config.server.provider.packages", "controller");
-
-        // Add a ProxyServlet for other resources (e.g., proxying to another service)
-        ServletHolder proxyServlet = context.addServlet(ProxyServlet.Transparent.class, "/resources/*");
-        proxyServlet.setInitParameter("proxyTo", LocalPaths.NGINX_ADDRESS); // Change the proxyTo URL as needed
-
-        server.start();
-        return server;
-    }
-
-    public static Server startServer2() throws Exception {
+    public static Server startServer() throws Exception {
         createUploadFolder();
 
         // Create a ResourceConfig instance and register packages or classes
         ResourceConfig config = new ResourceConfig();
         config.packages("controller");
+//        config.register(UploadFileService.class);
         config.register(MultiPartFeature.class);
 
         // Create a ServletContainer with the ResourceConfig

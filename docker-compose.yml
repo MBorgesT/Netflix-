@@ -7,8 +7,7 @@ services:
       MYSQL_DATABASE: main
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
-    ports:
-      - "3306:3306"
+
     networks:
       vpcbr:
         ipv4_address: 10.5.0.5
@@ -24,8 +23,12 @@ services:
   netflix_backend:
     build: backend/
     depends_on:
-      - netflix_mariadb
-      - netflix_nginx
+      netflix_mariadb:
+        condition: service_started
+      netflix_nginx:
+        condition: service_started
+    ports:
+      - "8080:8080"
     networks:
       vpcbr:
         ipv4_address: 10.5.0.8
