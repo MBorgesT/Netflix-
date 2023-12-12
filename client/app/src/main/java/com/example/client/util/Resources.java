@@ -7,7 +7,7 @@ import com.example.client.db.DBHelper;
 public class Resources {
 
 //    private static final String baseUrl = "http://10.0.2.8:8080/";
-    private static final String baseUrl = "http://192.168.1.68:8080/";
+    private static final String baseUrl = "http://104.197.193.0:8080/";
 
     public static final String backendApiUrl = baseUrl + "api/";
     public static final String backendResourcesUrl = baseUrl + "resources/";

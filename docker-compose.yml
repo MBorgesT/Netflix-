@@ -1,3 +1,6 @@
+volumes:
+  - ./appdata:/appdata
+
 services:
 
   netflix_mariadb:
@@ -15,13 +18,15 @@ services:
   netflix_nginx:
     build: nginx/
     volumes:
-      - /data:/data
+      - ./appdata:/appdata
     networks:
       vpcbr:
         ipv4_address: 10.5.0.7
 
   netflix_backend:
     build: backend/
+    volumes:
+      - ./appdata:/appdata
     depends_on:
       netflix_mariadb:
         condition: service_started
