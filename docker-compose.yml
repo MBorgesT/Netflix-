@@ -15,7 +15,7 @@ services:
   netflix_nginx:
     build: nginx/
     volumes:
-      - ./appdata:/appdata
+      - ./data:/data
     networks:
       vpcbr:
         ipv4_address: 10.5.0.7
@@ -23,7 +23,7 @@ services:
   netflix_backend:
     build: backend/
     volumes:
-      - ./appdata:/appdata
+      - ./data:/data
     depends_on:
       netflix_mariadb:
         condition: service_started
