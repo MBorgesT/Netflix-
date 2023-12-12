@@ -6,7 +6,7 @@ RUN java -version
 
 RUN apt-get -y update && apt-get -y upgrade && apt-get install -y --no-install-recommends ffmpeg
 
-RUN mkdir /data/
+# RUN mkdir /data/
 RUN mkdir /app/
 # RUN mkdir openjdk-21/
 

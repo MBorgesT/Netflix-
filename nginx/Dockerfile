@@ -5,5 +5,5 @@ FROM nginx:latest
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy the entire "data" folder from your host into the root directory of the container
-RUN mkdir /data
+# RUN mkdir /data
 # COPY /data /data
